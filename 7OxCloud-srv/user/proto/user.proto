@@ -1,0 +1,78 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+option go_package = ".;proto";
+
+service UserService {
+  rpc CheckMobile(CheckMobileRequest) returns (CheckMobileResponse) {}
+  rpc Register(RegisterRequest) returns (RegisterResponse) {}
+  rpc LoginBySMS(LoginBySMSRequest) returns (LoginResponse) {}
+  rpc LoginByPassword(LoginByPasswordRequest) returns (LoginResponse) {}
+  rpc GetUser(GetUserRequest) returns (GetUserResponse) {}
+  rpc UpdateUser(UpdateUserRequest) returns (google.protobuf.Empty) {}
+}
+
+message CheckMobileRequest {
+  string mobile = 1;
+}
+
+message CheckMobileResponse {
+  bool exist = 1;
+}
+
+message RegisterRequest {
+  string mobile = 1;
+  string password = 2;
+}
+
+message RegisterResponse {
+  int64 id = 1;
+}
+
+message LoginBySMSRequest{
+  string mobile = 1;
+}
+
+message LoginByPasswordRequest{
+  string mobile = 1;
+  string password = 2;
+}
+
+message LoginResponse{
+  int64 id = 1;
+}
+
+message GetUserRequest{
+  int64 id = 1;
+  int64 currentUserId = 2;
+}
+
+message GetUserResponse{
+  User user = 1;
+}
+
+message UpdateUserRequest{
+  int64 id = 1;
+  string username = 2;
+  int64 age = 3;
+  string location = 4;
+  string avatar = 5;
+  string backgroundImage = 6;
+  string signature = 7;
+}
+
+message User {
+  int64 id = 1;
+  string username = 2;
+  int64 age = 3;
+  string location = 4;
+  int64 followCount = 5;
+  int64 fanCount = 6;
+  string avatar = 7;
+  string backgroundImage = 8;
+  string signature = 9;
+  int64 LikedCount = 10;
+  int64 workCount = 11;
+  int64 likeCount = 12;
+  int64 collectCount = 13;
+  bool isFollow = 14;
+}

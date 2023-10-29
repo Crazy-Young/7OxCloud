@@ -1,0 +1,47 @@
+2023-10-28T20:35:31.927+0800	INFO	rpc/rpc_client.go:224	[RpcClient.Start] config-0-0d93384d-8e36-4ab1-8f60-8bd14619a08b try to connect to server on start up, server: {serverIp:172.28.242.13 serverPort:8848 serverGrpcPort:9848}
+2023-10-28T20:35:31.992+0800	INFO	util/common.go:96	Local IP:172.28.240.1
+2023-10-28T20:35:32.104+0800	INFO	rpc/rpc_client.go:234	config-0-0d93384d-8e36-4ab1-8f60-8bd14619a08b success to connect to server {serverIp:172.28.242.13 serverPort:8848 serverGrpcPort:9848} on start up, connectionId=1698496531945_172.28.240.1_58765
+2023-10-28T21:11:15.953+0800	INFO	rpc/rpc_client.go:224	[RpcClient.Start] config-0-ecf677ca-268a-41de-a815-613ed5c28975 try to connect to server on start up, server: {serverIp:172.28.242.13 serverPort:8848 serverGrpcPort:9848}
+2023-10-28T21:11:16.020+0800	INFO	util/common.go:96	Local IP:172.28.240.1
+2023-10-28T21:11:16.135+0800	INFO	rpc/rpc_client.go:234	config-0-ecf677ca-268a-41de-a815-613ed5c28975 success to connect to server {serverIp:172.28.242.13 serverPort:8848 serverGrpcPort:9848} on start up, connectionId=1698498675976_172.28.240.1_59462
+2023-10-28T21:38:16.732+0800	INFO	rpc/rpc_client.go:224	[RpcClient.Start] config-0-56d17125-32d6-4139-a3bc-d93e958a91c2 try to connect to server on start up, server: {serverIp:172.28.242.13 serverPort:8848 serverGrpcPort:9848}
+2023-10-28T21:38:16.801+0800	INFO	util/common.go:96	Local IP:172.28.240.1
+2023-10-28T21:38:16.908+0800	INFO	rpc/rpc_client.go:234	config-0-56d17125-32d6-4139-a3bc-d93e958a91c2 success to connect to server {serverIp:172.28.242.13 serverPort:8848 serverGrpcPort:9848} on start up, connectionId=1698500296763_172.28.240.1_50353
+2023-10-28T22:10:18.691+0800	INFO	rpc/rpc_client.go:224	[RpcClient.Start] config-0-f702790b-1380-4d8d-a3e8-2b3f18a94ed0 try to connect to server on start up, server: {serverIp:172.28.242.13 serverPort:8848 serverGrpcPort:9848}
+2023-10-28T22:10:18.755+0800	INFO	util/common.go:96	Local IP:172.28.240.1
+2023-10-28T22:10:18.871+0800	INFO	rpc/rpc_client.go:234	config-0-f702790b-1380-4d8d-a3e8-2b3f18a94ed0 success to connect to server {serverIp:172.28.242.13 serverPort:8848 serverGrpcPort:9848} on start up, connectionId=1698502218713_172.28.240.1_51268
+2023-10-28T22:11:43.622+0800	INFO	rpc/rpc_client.go:224	[RpcClient.Start] config-0-ef83cb2b-a8e8-418e-bba8-8724cfe00805 try to connect to server on start up, server: {serverIp:172.28.242.13 serverPort:8848 serverGrpcPort:9848}
+2023-10-28T22:11:43.694+0800	INFO	util/common.go:96	Local IP:172.28.240.1
+2023-10-28T22:11:43.807+0800	INFO	rpc/rpc_client.go:234	config-0-ef83cb2b-a8e8-418e-bba8-8724cfe00805 success to connect to server {serverIp:172.28.242.13 serverPort:8848 serverGrpcPort:9848} on start up, connectionId=1698502303639_172.28.240.1_51316
+2023-10-28T22:12:21.958+0800	INFO	rpc/rpc_client.go:224	[RpcClient.Start] config-0-b63020ff-1bf6-4a41-b27e-2f4176e79275 try to connect to server on start up, server: {serverIp:172.28.242.13 serverPort:8848 serverGrpcPort:9848}
+2023-10-28T22:12:22.023+0800	INFO	util/common.go:96	Local IP:172.28.240.1
+2023-10-28T22:12:22.136+0800	INFO	rpc/rpc_client.go:234	config-0-b63020ff-1bf6-4a41-b27e-2f4176e79275 success to connect to server {serverIp:172.28.242.13 serverPort:8848 serverGrpcPort:9848} on start up, connectionId=1698502341978_172.28.240.1_51340
+2023-10-28T22:14:41.131+0800	INFO	rpc/rpc_client.go:224	[RpcClient.Start] config-0-a7408891-8e52-40c2-aed5-7ff0b7dd3136 try to connect to server on start up, server: {serverIp:172.28.242.13 serverPort:8848 serverGrpcPort:9848}
+2023-10-28T22:14:41.197+0800	INFO	util/common.go:96	Local IP:172.28.240.1
+2023-10-28T22:14:41.305+0800	INFO	rpc/rpc_client.go:234	config-0-a7408891-8e52-40c2-aed5-7ff0b7dd3136 success to connect to server {serverIp:172.28.242.13 serverPort:8848 serverGrpcPort:9848} on start up, connectionId=1698502481151_172.28.240.1_51399
+2023-10-28T22:15:40.843+0800	INFO	rpc/rpc_client.go:224	[RpcClient.Start] config-0-cc00f1e4-53e2-4f2f-9881-514395d4ed39 try to connect to server on start up, server: {serverIp:172.28.242.13 serverPort:8848 serverGrpcPort:9848}
+2023-10-28T22:15:40.915+0800	INFO	util/common.go:96	Local IP:172.28.240.1
+2023-10-28T22:15:41.036+0800	INFO	rpc/rpc_client.go:234	config-0-cc00f1e4-53e2-4f2f-9881-514395d4ed39 success to connect to server {serverIp:172.28.242.13 serverPort:8848 serverGrpcPort:9848} on start up, connectionId=1698502540865_172.28.240.1_51426
+2023-10-28T22:16:13.707+0800	INFO	rpc/rpc_client.go:224	[RpcClient.Start] config-0-3b75253b-3c8e-4fd8-b312-8e61cd96c617 try to connect to server on start up, server: {serverIp:172.28.242.13 serverPort:8848 serverGrpcPort:9848}
+2023-10-28T22:16:13.781+0800	INFO	util/common.go:96	Local IP:172.28.240.1
+2023-10-28T22:16:13.890+0800	INFO	rpc/rpc_client.go:234	config-0-3b75253b-3c8e-4fd8-b312-8e61cd96c617 success to connect to server {serverIp:172.28.242.13 serverPort:8848 serverGrpcPort:9848} on start up, connectionId=1698502573730_172.28.240.1_51451
+2023-10-28T22:21:51.181+0800	INFO	rpc/rpc_client.go:224	[RpcClient.Start] config-0-abe57223-d204-4a31-8fd9-59db58882532 try to connect to server on start up, server: {serverIp:172.28.242.13 serverPort:8848 serverGrpcPort:9848}
+2023-10-28T22:21:51.250+0800	INFO	util/common.go:96	Local IP:172.28.240.1
+2023-10-28T22:21:51.355+0800	INFO	rpc/rpc_client.go:234	config-0-abe57223-d204-4a31-8fd9-59db58882532 success to connect to server {serverIp:172.28.242.13 serverPort:8848 serverGrpcPort:9848} on start up, connectionId=1698502911206_172.28.240.1_51631
+2023-10-29T22:13:54.594+0800	INFO	rpc/rpc_client.go:224	[RpcClient.Start] config-0-9c5d0814-c73d-4fa9-8c42-e3d3cefb5f3a try to connect to server on start up, server: {serverIp:172.28.242.13 serverPort:8848 serverGrpcPort:9848}
+2023-10-29T22:13:54.594+0800	INFO	rpc/rpc_client.go:224	[RpcClient.Start] config-0-73e3d34e-f795-4266-9276-f06b597549a3 try to connect to server on start up, server: {serverIp:172.28.242.13 serverPort:8848 serverGrpcPort:9848}
+2023-10-29T22:13:54.683+0800	INFO	util/common.go:96	Local IP:172.28.240.1
+2023-10-29T22:13:54.683+0800	INFO	util/common.go:96	Local IP:172.28.240.1
+2023-10-29T22:13:54.830+0800	INFO	rpc/rpc_client.go:234	config-0-73e3d34e-f795-4266-9276-f06b597549a3 success to connect to server {serverIp:172.28.242.13 serverPort:8848 serverGrpcPort:9848} on start up, connectionId=1698588834620_172.28.240.1_63700
+2023-10-29T22:13:54.830+0800	INFO	rpc/rpc_client.go:234	config-0-9c5d0814-c73d-4fa9-8c42-e3d3cefb5f3a success to connect to server {serverIp:172.28.242.13 serverPort:8848 serverGrpcPort:9848} on start up, connectionId=1698588834620_172.28.240.1_63701
+2023-10-29T22:13:54.850+0800	ERROR	cache/disk_cache.go:86	failed to delete config file,cache:7OxCloud-srv/tmp/nacos/cache\config\VideoService.json@@dev@@b4d4ee25-315d-448d-a784-a35442f015b5 ,value: ,err:remove 7OxCloud-srv/tmp/nacos/cache\config\VideoService.json@@dev@@b4d4ee25-315d-448d-a784-a35442f015b5: The system cannot find the file specified.
+2023-10-29T22:17:02.982+0800	INFO	rpc/rpc_client.go:224	[RpcClient.Start] config-0-c70d368a-88e1-40c7-9aaa-d4036ffe85d2 try to connect to server on start up, server: {serverIp:172.28.242.13 serverPort:8848 serverGrpcPort:9848}
+2023-10-29T22:17:03.052+0800	INFO	util/common.go:96	Local IP:172.28.240.1
+2023-10-29T22:17:03.157+0800	INFO	rpc/rpc_client.go:234	config-0-c70d368a-88e1-40c7-9aaa-d4036ffe85d2 success to connect to server {serverIp:172.28.242.13 serverPort:8848 serverGrpcPort:9848} on start up, connectionId=1698589023002_172.28.240.1_63875
+2023-10-29T22:17:03.164+0800	ERROR	cache/disk_cache.go:86	failed to delete config file,cache:7OxCloud-srv/tmp/nacos/cache\config\VideoService.json@@dev@@b4d4ee25-315d-448d-a784-a35442f015b5 ,value: ,err:remove 7OxCloud-srv/tmp/nacos/cache\config\VideoService.json@@dev@@b4d4ee25-315d-448d-a784-a35442f015b5: The system cannot find the file specified.
+2023-10-29T22:17:36.569+0800	INFO	rpc/rpc_client.go:224	[RpcClient.Start] config-0-7f7f4ff7-7e73-4fd3-ac3e-c6b138d35f99 try to connect to server on start up, server: {serverIp:172.28.242.13 serverPort:8848 serverGrpcPort:9848}
+2023-10-29T22:17:36.635+0800	INFO	util/common.go:96	Local IP:172.28.240.1
+2023-10-29T22:17:36.740+0800	INFO	rpc/rpc_client.go:234	config-0-7f7f4ff7-7e73-4fd3-ac3e-c6b138d35f99 success to connect to server {serverIp:172.28.242.13 serverPort:8848 serverGrpcPort:9848} on start up, connectionId=1698589056587_172.28.240.1_63887
+2023-10-29T22:18:12.598+0800	INFO	rpc/rpc_client.go:224	[RpcClient.Start] config-0-4345fa60-937f-42c7-a4f7-700cda405dbc try to connect to server on start up, server: {serverIp:172.28.242.13 serverPort:8848 serverGrpcPort:9848}
+2023-10-29T22:18:12.661+0800	INFO	util/common.go:96	Local IP:172.28.240.1
+2023-10-29T22:18:12.770+0800	INFO	rpc/rpc_client.go:234	config-0-4345fa60-937f-42c7-a4f7-700cda405dbc success to connect to server {serverIp:172.28.242.13 serverPort:8848 serverGrpcPort:9848} on start up, connectionId=1698589092615_172.28.240.1_63913

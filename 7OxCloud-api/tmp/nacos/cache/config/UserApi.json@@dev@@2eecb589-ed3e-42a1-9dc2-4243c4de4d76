@@ -1,0 +1,36 @@
+{
+    "api": {
+        "name": "UserApi",
+        "host": "10.252.73.145",
+        "tags": ["7OxCloud","User","Api"]
+    },
+    "service": {
+        "name": "UserService"
+    },
+    "jwt": {
+        "signingKey": "7OxCloudByPalp1tate",
+        "expiration": 60
+    },
+    "sms": {
+        "accessKeyId": "LTAI5t9tWZYvBHG5ME5aT4WB",
+        "accessKeySecret": "kDY6EV2nNjnFXCWAUVeXYaReioeYs0",
+        "signName": "成电wxy",
+        "templateCode": "SMS_463674229"
+    },
+    "redis": {
+        "host": "172.28.242.13",
+        "port": 6379,
+        "expiration": 120
+    },
+    "consul": {
+        "host": "172.28.242.13",
+        "port": 8500
+    },
+    "qiniuyun": {
+        "accessKey": "2HgBxOWm_qU7N420MCfB9E4OLGDFM9ybuK1rmCP7",
+        "secretKey": "QP8hTb9GIQk_dFSuTIWF8R9BaqlmL8I6bmIuw1m9",
+        "bucket": "7oxcloud",
+        "domain": "http://s38ddu7np.hn-bkt.clouddn.com"
+    }
+}
+
