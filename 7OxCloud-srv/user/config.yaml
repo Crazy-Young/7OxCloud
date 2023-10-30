@@ -1,0 +1,7 @@
+host: '172.28.242.13'
+port: 8848
+namespace: '2eecb589-ed3e-42a1-9dc2-4243c4de4d76'
+user: 'nacos'
+password: 'nacos'
+dataId: 'UserService.json'
+group: 'dev'
