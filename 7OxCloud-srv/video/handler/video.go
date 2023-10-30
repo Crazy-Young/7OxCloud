@@ -164,25 +164,25 @@ func (s *VideoServer) FeedBySearch(ctx context.Context, req *proto.FeedBySearchR
 }
 
 func VideoModelToResponse(video *model.Video, currentUserId int64) *proto.Video {
+	vid := video.ID
+	likeCount, _ := dao.GetVideoLikeCount(vid)
 	tx := global.DB.Begin()
 	defer func() {
 		if r := recover(); r != nil {
 			tx.Rollback()
 		}
 	}()
-	vid := video.ID
-	likeCount, _ := dao.GetVideoLikeCount(vid)
 	commentCount, _ := dao.GetVideoCommentCount(tx, vid)
 	collectCount, _ := dao.GetVideoCollectCount(tx, vid)
 	isLike, _ := dao.GetIsLike(tx, vid, currentUserId)
 	author, _ := dao.FindAuthor(tx, vid)
 	topicList, _ := dao.GetVideoTopics(tx, vid)
+	if err := tx.Commit().Error; err != nil {
+		return nil
+	}
 	topics := make([]*proto.Topic, len(topicList))
 	for i, topic := range topicList {
 		topics[i] = TopicModelToResponse(topic)
-	}
-	if err := tx.Commit().Error; err != nil {
-		return nil
 	}
 	return &proto.Video{
 		Id:           vid,

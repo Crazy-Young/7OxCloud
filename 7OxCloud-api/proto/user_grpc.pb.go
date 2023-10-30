@@ -8,6 +8,7 @@ package proto
 
 import (
 	context "context"
+
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -118,27 +119,32 @@ type UserServiceServer interface {
 }
 
 // UnimplementedUserServiceServer must be embedded to have forward compatible implementations.
-type UnimplementedUserServiceServer struct {
-}
+type UnimplementedUserServiceServer struct{}
 
 func (UnimplementedUserServiceServer) CheckMobile(context.Context, *CheckMobileRequest) (*CheckMobileResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckMobile not implemented")
 }
+
 func (UnimplementedUserServiceServer) Register(context.Context, *RegisterRequest) (*RegisterResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Register not implemented")
 }
+
 func (UnimplementedUserServiceServer) LoginBySMS(context.Context, *LoginBySMSRequest) (*LoginResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LoginBySMS not implemented")
 }
+
 func (UnimplementedUserServiceServer) LoginByPassword(context.Context, *LoginByPasswordRequest) (*LoginResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LoginByPassword not implemented")
 }
+
 func (UnimplementedUserServiceServer) GetUser(context.Context, *GetUserRequest) (*GetUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUser not implemented")
 }
+
 func (UnimplementedUserServiceServer) UpdateUser(context.Context, *UpdateUserRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUser not implemented")
 }
+
 func (UnimplementedUserServiceServer) ResetPassword(context.Context, *ResetPasswordRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ResetPassword not implemented")
 }

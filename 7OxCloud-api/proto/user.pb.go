@@ -7,11 +7,12 @@
 package proto
 
 import (
+	reflect "reflect"
+	sync "sync"
+
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
-	reflect "reflect"
-	sync "sync"
 )
 
 const (
@@ -887,22 +888,24 @@ func file_user_proto_rawDescGZIP() []byte {
 	return file_user_proto_rawDescData
 }
 
-var file_user_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
-var file_user_proto_goTypes = []interface{}{
-	(*CheckMobileRequest)(nil),     // 0: CheckMobileRequest
-	(*CheckMobileResponse)(nil),    // 1: CheckMobileResponse
-	(*RegisterRequest)(nil),        // 2: RegisterRequest
-	(*RegisterResponse)(nil),       // 3: RegisterResponse
-	(*LoginBySMSRequest)(nil),      // 4: LoginBySMSRequest
-	(*LoginByPasswordRequest)(nil), // 5: LoginByPasswordRequest
-	(*LoginResponse)(nil),          // 6: LoginResponse
-	(*GetUserRequest)(nil),         // 7: GetUserRequest
-	(*GetUserResponse)(nil),        // 8: GetUserResponse
-	(*UpdateUserRequest)(nil),      // 9: UpdateUserRequest
-	(*User)(nil),                   // 10: User
-	(*ResetPasswordRequest)(nil),   // 11: ResetPasswordRequest
-	(*emptypb.Empty)(nil),          // 12: google.protobuf.Empty
-}
+var (
+	file_user_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
+	file_user_proto_goTypes  = []interface{}{
+		(*CheckMobileRequest)(nil),     // 0: CheckMobileRequest
+		(*CheckMobileResponse)(nil),    // 1: CheckMobileResponse
+		(*RegisterRequest)(nil),        // 2: RegisterRequest
+		(*RegisterResponse)(nil),       // 3: RegisterResponse
+		(*LoginBySMSRequest)(nil),      // 4: LoginBySMSRequest
+		(*LoginByPasswordRequest)(nil), // 5: LoginByPasswordRequest
+		(*LoginResponse)(nil),          // 6: LoginResponse
+		(*GetUserRequest)(nil),         // 7: GetUserRequest
+		(*GetUserResponse)(nil),        // 8: GetUserResponse
+		(*UpdateUserRequest)(nil),      // 9: UpdateUserRequest
+		(*User)(nil),                   // 10: User
+		(*ResetPasswordRequest)(nil),   // 11: ResetPasswordRequest
+		(*emptypb.Empty)(nil),          // 12: google.protobuf.Empty
+	}
+)
 var file_user_proto_depIdxs = []int32{
 	10, // 0: GetUserResponse.user:type_name -> User
 	0,  // 1: UserService.CheckMobile:input_type -> CheckMobileRequest

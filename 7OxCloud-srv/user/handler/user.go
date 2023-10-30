@@ -6,6 +6,7 @@ import (
 
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/palp1tate/7OxCloud/7OxCloud-srv/user/dao"
+	"github.com/palp1tate/7OxCloud/7OxCloud-srv/user/global"
 	"github.com/palp1tate/7OxCloud/7OxCloud-srv/user/model"
 	"github.com/palp1tate/7OxCloud/7OxCloud-srv/user/proto"
 	"github.com/palp1tate/go-crypto-guard/pbkdf2"
@@ -89,7 +90,7 @@ func (s *UserServer) UpdateUser(ctx context.Context, req *proto.UpdateUserReques
 	user.Age = int(req.Age)
 	user.Location = req.Location
 	user.Avatar = req.Avatar
-	user.BackgroundImage = req.BackgroundImage
+	user.Gender = int(req.Gender)
 	user.Signature = req.Signature
 	err = dao.UpdateUser(&user)
 	if err != nil {
@@ -98,29 +99,51 @@ func (s *UserServer) UpdateUser(ctx context.Context, req *proto.UpdateUserReques
 	return &empty.Empty{}, nil
 }
 
+func (s *UserServer) ResetPassword(ctx context.Context, req *proto.ResetPasswordRequest) (*empty.Empty, error) {
+	user, err := dao.FindUserByMobile(req.Mobile)
+	if err != nil {
+		return nil, status.Errorf(codes.NotFound, "该手机号未注册")
+	}
+	password, _ := pwd.GenSHA512(req.Password, 16, 32, 50)
+	err = dao.UpdateUserPassword(&user, password)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "修改密码失败")
+	}
+	return &empty.Empty{}, nil
+}
+
 func UserModelToResponse(user model.User, currentUserId int64) *proto.User {
+	tx := global.DB.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
 	uid := user.ID
-	followCount, _ := dao.GetFollowCount(uid)
-	fanCount, _ := dao.GetFanCount(uid)
-	isFollow, _ := dao.GetIsFollow(uid, currentUserId)
-	likeCount, _ := dao.GetLikeCount(uid)
-	likedCount, _ := dao.GetLikedCount(uid)
-	workCount, _ := dao.GetWorkCount(uid)
-	collectCount, _ := dao.GetCollectCount(uid)
+	followCount, _ := dao.GetFollowCount(tx, uid)
+	fanCount, _ := dao.GetFanCount(tx, uid)
+	isFollow, _ := dao.GetIsFollow(tx, uid, currentUserId)
+	likeCount, _ := dao.GetLikeCount(tx, uid)
+	likedCount, _ := dao.GetLikedCount(tx, uid)
+	workCount, _ := dao.GetWorkCount(tx, uid)
+	collectCount, _ := dao.GetCollectCount(tx, uid)
+	if err := tx.Commit().Error; err != nil {
+		return nil
+	}
 	return &proto.User{
-		Id:              user.ID,
-		Age:             int64(user.Age),
-		Username:        user.Username,
-		Location:        user.Location,
-		Avatar:          user.Avatar,
-		BackgroundImage: user.BackgroundImage,
-		Signature:       user.Signature,
-		FollowCount:     followCount,
-		FanCount:        fanCount,
-		IsFollow:        isFollow,
-		LikeCount:       likeCount,
-		LikedCount:      likedCount,
-		WorkCount:       workCount,
-		CollectCount:    collectCount,
+		Id:           user.ID,
+		Age:          int64(user.Age),
+		Username:     user.Username,
+		Location:     user.Location,
+		Avatar:       user.Avatar,
+		Gender:       int64(user.Gender),
+		Signature:    user.Signature,
+		FollowCount:  followCount,
+		FanCount:     fanCount,
+		IsFollow:     isFollow,
+		LikeCount:    likeCount,
+		LikedCount:   likedCount,
+		WorkCount:    workCount,
+		CollectCount: collectCount,
 	}
 }
