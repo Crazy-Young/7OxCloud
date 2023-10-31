@@ -2,41 +2,43 @@ package handler
 
 import (
 	"context"
-
-	"github.com/palp1tate/7OxCloud/7OxCloud-srv/video/global"
+	"time"
 
 	"github.com/bwmarrin/snowflake"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/palp1tate/7OxCloud/7OxCloud-srv/video/dao"
-	"github.com/palp1tate/7OxCloud/7OxCloud-srv/video/model"
-	"github.com/palp1tate/7OxCloud/7OxCloud-srv/video/proto"
-	"github.com/palp1tate/7OxCloud/7OxCloud-srv/video/util"
+	"github.com/palp1tate/7OxCloud/7OxCloud-srv/video/global"
+	"github.com/palp1tate/7OxCloud/model"
+	"github.com/palp1tate/7OxCloud/proto/video"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
 type VideoServer struct {
-	proto.UnimplementedVideoServiceServer
+	videoProto.UnimplementedVideoServiceServer
 }
 
-func (s *VideoServer) Feed(ctx context.Context, req *proto.FeedRequest) (*proto.FeedResponse, error) {
-	latestTime := util.ConvertTimestamp2Time(req.LatestTime)
+func (s *VideoServer) Feed(ctx context.Context, req *videoProto.FeedRequest) (*videoProto.FeedResponse, error) {
+	latestTime := time.Unix(req.LatestTime, 0)
 	videoList, err := dao.GetVideos(latestTime)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "获取视频流失败")
 	}
-	videos := make([]*proto.Video, len(videoList))
+	if len(videoList) == 0 {
+		return &videoProto.FeedResponse{}, nil
+	}
+	videos := make([]*videoProto.Video, len(videoList))
 	for i, video := range videoList {
 		videos[i] = VideoModelToResponse(video, req.CurrentUserId)
 	}
-	res := &proto.FeedResponse{
+	res := &videoProto.FeedResponse{
 		Videos:   videos,
-		NextTime: util.ConvertTime2Timestamp(videoList[len(videoList)-1].CreatedAt),
+		NextTime: videoList[len(videoList)-1].CreatedAt.Unix(),
 	}
 	return res, nil
 }
 
-func (s *VideoServer) Publish(ctx context.Context, req *proto.PublishRequest) (*empty.Empty, error) {
+func (s *VideoServer) Publish(ctx context.Context, req *videoProto.PublishRequest) (*empty.Empty, error) {
 	node, err := snowflake.NewNode(1)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "视频ID生成失败")
@@ -56,114 +58,123 @@ func (s *VideoServer) Publish(ctx context.Context, req *proto.PublishRequest) (*
 	return &empty.Empty{}, nil
 }
 
-func (s *VideoServer) PublishList(ctx context.Context, req *proto.PublishListRequest) (*proto.PublishListResponse, error) {
+func (s *VideoServer) PublishList(ctx context.Context, req *videoProto.PublishListRequest) (*videoProto.PublishListResponse, error) {
 	videoList, err := dao.GetVideosByUserId(req.Uid)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "获取视频列表失败")
 	}
-	videos := make([]*proto.MiniVideo, len(videoList))
+	videos := make([]*videoProto.MiniVideo, len(videoList))
 	for i, video := range videoList {
 		videos[i] = MiniVideoModelToResponse(video)
 	}
-	res := &proto.PublishListResponse{
+	res := &videoProto.PublishListResponse{
 		Videos: videos,
 	}
 	return res, nil
 }
 
-func (s *VideoServer) Video(ctx context.Context, req *proto.VideoRequest) (*proto.VideoResponse, error) {
+func (s *VideoServer) Video(ctx context.Context, req *videoProto.VideoRequest) (*videoProto.VideoResponse, error) {
 	video, err := dao.GetVideo(req.Id)
 	if err != nil {
 		return nil, status.Errorf(codes.NotFound, "视频不存在")
 	}
-	res := &proto.VideoResponse{
+	res := &videoProto.VideoResponse{
 		Video: VideoModelToResponse(video, req.CurrentUserId),
 	}
 	return res, nil
 }
 
-func (s *VideoServer) FeedByTopic(ctx context.Context, req *proto.FeedByTopicRequest) (*proto.FeedResponse, error) {
-	latestTime := util.ConvertTimestamp2Time(req.LatestTime)
+func (s *VideoServer) FeedByTopic(ctx context.Context, req *videoProto.FeedByTopicRequest) (*videoProto.FeedResponse, error) {
+	latestTime := time.Unix(req.LatestTime, 0)
 	videoList, err := dao.GetVideosByTopicId(latestTime, req.TopicId)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "获取视频流失败")
 	}
-	videos := make([]*proto.Video, len(videoList))
+	if len(videoList) == 0 {
+		return &videoProto.FeedResponse{}, nil
+	}
+	videos := make([]*videoProto.Video, len(videoList))
 	for i, video := range videoList {
 		videos[i] = VideoModelToResponse(video, req.CurrentUserId)
 	}
-	res := &proto.FeedResponse{
+	res := &videoProto.FeedResponse{
 		Videos:   videos,
-		NextTime: util.ConvertTime2Timestamp(videoList[len(videoList)-1].CreatedAt),
+		NextTime: videoList[len(videoList)-1].CreatedAt.Unix(),
 	}
 	return res, nil
 }
 
-func (s *VideoServer) CategoryList(ctx context.Context, req *empty.Empty) (*proto.CategoryListResponse, error) {
+func (s *VideoServer) CategoryList(ctx context.Context, req *empty.Empty) (*videoProto.CategoryListResponse, error) {
 	categoryList, err := dao.GetCategories()
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "获取分类列表失败")
 	}
-	categories := make([]*proto.Category, len(categoryList))
+	categories := make([]*videoProto.Category, len(categoryList))
 	for i, category := range categoryList {
 		categories[i] = CategoryModelToResponse(category)
 	}
-	res := &proto.CategoryListResponse{
+	res := &videoProto.CategoryListResponse{
 		Categories: categories,
 	}
 	return res, nil
 }
 
-func (s *VideoServer) TopicList(ctx context.Context, req *empty.Empty) (*proto.TopicListResponse, error) {
+func (s *VideoServer) TopicList(ctx context.Context, req *empty.Empty) (*videoProto.TopicListResponse, error) {
 	topicList, err := dao.GetTopics()
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "获取话题列表失败")
 	}
-	topics := make([]*proto.Topic, len(topicList))
+	topics := make([]*videoProto.Topic, len(topicList))
 	for i, topic := range topicList {
 		topics[i] = TopicModelToResponse(topic)
 	}
-	res := &proto.TopicListResponse{
+	res := &videoProto.TopicListResponse{
 		Topics: topics,
 	}
 	return res, nil
 }
 
-func (s *VideoServer) FeedByCategory(ctx context.Context, req *proto.FeedByCategoryRequest) (*proto.FeedResponse, error) {
-	latestTime := util.ConvertTimestamp2Time(req.LatestTime)
+func (s *VideoServer) FeedByCategory(ctx context.Context, req *videoProto.FeedByCategoryRequest) (*videoProto.FeedResponse, error) {
+	latestTime := time.Unix(req.LatestTime, 0)
 	videoList, err := dao.GetVideosByCategoryId(latestTime, req.CategoryId)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "获取视频流失败")
 	}
-	videos := make([]*proto.Video, len(videoList))
+	if len(videoList) == 0 {
+		return &videoProto.FeedResponse{}, nil
+	}
+	videos := make([]*videoProto.Video, len(videoList))
 	for i, video := range videoList {
 		videos[i] = VideoModelToResponse(video, req.CurrentUserId)
 	}
-	res := &proto.FeedResponse{
+	res := &videoProto.FeedResponse{
 		Videos:   videos,
-		NextTime: util.ConvertTime2Timestamp(videoList[len(videoList)-1].CreatedAt),
+		NextTime: videoList[len(videoList)-1].CreatedAt.Unix(),
 	}
 	return res, nil
 }
 
-func (s *VideoServer) FeedBySearch(ctx context.Context, req *proto.FeedBySearchRequest) (*proto.FeedResponse, error) {
-	latestTime := util.ConvertTimestamp2Time(req.LatestTime)
+func (s *VideoServer) FeedBySearch(ctx context.Context, req *videoProto.FeedBySearchRequest) (*videoProto.FeedResponse, error) {
+	latestTime := time.Unix(req.LatestTime, 0)
 	videoList, err := dao.GetVideosBySearch(latestTime, req.Keyword)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "获取视频流失败")
 	}
-	videos := make([]*proto.Video, len(videoList))
+	if len(videoList) == 0 {
+		return &videoProto.FeedResponse{}, nil
+	}
+	videos := make([]*videoProto.Video, len(videoList))
 	for i, video := range videoList {
 		videos[i] = VideoModelToResponse(video, req.CurrentUserId)
 	}
-	res := &proto.FeedResponse{
+	res := &videoProto.FeedResponse{
 		Videos:   videos,
-		NextTime: util.ConvertTime2Timestamp(videoList[len(videoList)-1].CreatedAt),
+		NextTime: videoList[len(videoList)-1].CreatedAt.Unix(),
 	}
 	return res, nil
 }
 
-func VideoModelToResponse(video *model.Video, currentUserId int64) *proto.Video {
+func VideoModelToResponse(video *model.Video, currentUserId int64) *videoProto.Video {
 	vid := video.ID
 	likeCount, _ := dao.GetVideoLikeCount(vid)
 	tx := global.DB.Begin()
@@ -180,11 +191,11 @@ func VideoModelToResponse(video *model.Video, currentUserId int64) *proto.Video 
 	if err := tx.Commit().Error; err != nil {
 		return nil
 	}
-	topics := make([]*proto.Topic, len(topicList))
+	topics := make([]*videoProto.Topic, len(topicList))
 	for i, topic := range topicList {
 		topics[i] = TopicModelToResponse(topic)
 	}
-	return &proto.Video{
+	return &videoProto.Video{
 		Id:           vid,
 		Description:  video.Description,
 		PlayUrl:      video.PlayUrl,
@@ -195,13 +206,13 @@ func VideoModelToResponse(video *model.Video, currentUserId int64) *proto.Video 
 		IsLike:       isLike,
 		Author:       UserModelToResponse(author, currentUserId),
 		Topics:       topics,
-		PublishTime:  util.ConvertTime2Timestamp(video.CreatedAt),
+		PublishTime:  video.CreatedAt.Unix(),
 	}
 }
 
-func UserModelToResponse(user model.User, currentUserId int64) *proto.User {
+func UserModelToResponse(user model.User, currentUserId int64) *videoProto.User {
 	isFollow, _ := dao.GetIsFollow(user.ID, currentUserId)
-	return &proto.User{
+	return &videoProto.User{
 		Id:       user.ID,
 		Username: user.Username,
 		Avatar:   user.Avatar,
@@ -210,24 +221,24 @@ func UserModelToResponse(user model.User, currentUserId int64) *proto.User {
 	}
 }
 
-func TopicModelToResponse(topic *model.Topic) *proto.Topic {
-	return &proto.Topic{
+func TopicModelToResponse(topic *model.Topic) *videoProto.Topic {
+	return &videoProto.Topic{
 		Id:          topic.ID,
 		Description: topic.Description,
 	}
 }
 
-func MiniVideoModelToResponse(video *model.Video) *proto.MiniVideo {
+func MiniVideoModelToResponse(video *model.Video) *videoProto.MiniVideo {
 	likeCount, _ := dao.GetVideoLikeCount(video.ID)
-	return &proto.MiniVideo{
+	return &videoProto.MiniVideo{
 		Id:        video.ID,
 		CoverUrl:  video.CoverUrl,
 		LikeCount: likeCount,
 	}
 }
 
-func CategoryModelToResponse(category *model.Category) *proto.Category {
-	return &proto.Category{
+func CategoryModelToResponse(category *model.Category) *videoProto.Category {
+	return &videoProto.Category{
 		Id:   category.ID,
 		Name: category.Name,
 	}

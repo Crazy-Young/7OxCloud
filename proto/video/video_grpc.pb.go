@@ -4,7 +4,7 @@
 // - protoc             v4.24.0
 // source: video.proto
 
-package proto
+package videoProto
 
 import (
 	context "context"
@@ -44,7 +44,7 @@ func NewVideoServiceClient(cc grpc.ClientConnInterface) VideoServiceClient {
 
 func (c *videoServiceClient) Feed(ctx context.Context, in *FeedRequest, opts ...grpc.CallOption) (*FeedResponse, error) {
 	out := new(FeedResponse)
-	err := c.cc.Invoke(ctx, "/VideoService/Feed", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/videoProto.VideoService/Feed", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +53,7 @@ func (c *videoServiceClient) Feed(ctx context.Context, in *FeedRequest, opts ...
 
 func (c *videoServiceClient) Publish(ctx context.Context, in *PublishRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/VideoService/Publish", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/videoProto.VideoService/Publish", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +62,7 @@ func (c *videoServiceClient) Publish(ctx context.Context, in *PublishRequest, op
 
 func (c *videoServiceClient) Video(ctx context.Context, in *VideoRequest, opts ...grpc.CallOption) (*VideoResponse, error) {
 	out := new(VideoResponse)
-	err := c.cc.Invoke(ctx, "/VideoService/Video", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/videoProto.VideoService/Video", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +71,7 @@ func (c *videoServiceClient) Video(ctx context.Context, in *VideoRequest, opts .
 
 func (c *videoServiceClient) PublishList(ctx context.Context, in *PublishListRequest, opts ...grpc.CallOption) (*PublishListResponse, error) {
 	out := new(PublishListResponse)
-	err := c.cc.Invoke(ctx, "/VideoService/PublishList", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/videoProto.VideoService/PublishList", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func (c *videoServiceClient) PublishList(ctx context.Context, in *PublishListReq
 
 func (c *videoServiceClient) FeedByTopic(ctx context.Context, in *FeedByTopicRequest, opts ...grpc.CallOption) (*FeedResponse, error) {
 	out := new(FeedResponse)
-	err := c.cc.Invoke(ctx, "/VideoService/FeedByTopic", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/videoProto.VideoService/FeedByTopic", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +89,7 @@ func (c *videoServiceClient) FeedByTopic(ctx context.Context, in *FeedByTopicReq
 
 func (c *videoServiceClient) CategoryList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*CategoryListResponse, error) {
 	out := new(CategoryListResponse)
-	err := c.cc.Invoke(ctx, "/VideoService/CategoryList", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/videoProto.VideoService/CategoryList", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +98,7 @@ func (c *videoServiceClient) CategoryList(ctx context.Context, in *emptypb.Empty
 
 func (c *videoServiceClient) TopicList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*TopicListResponse, error) {
 	out := new(TopicListResponse)
-	err := c.cc.Invoke(ctx, "/VideoService/TopicList", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/videoProto.VideoService/TopicList", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +107,7 @@ func (c *videoServiceClient) TopicList(ctx context.Context, in *emptypb.Empty, o
 
 func (c *videoServiceClient) FeedByCategory(ctx context.Context, in *FeedByCategoryRequest, opts ...grpc.CallOption) (*FeedResponse, error) {
 	out := new(FeedResponse)
-	err := c.cc.Invoke(ctx, "/VideoService/FeedByCategory", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/videoProto.VideoService/FeedByCategory", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +116,7 @@ func (c *videoServiceClient) FeedByCategory(ctx context.Context, in *FeedByCateg
 
 func (c *videoServiceClient) FeedBySearch(ctx context.Context, in *FeedBySearchRequest, opts ...grpc.CallOption) (*FeedResponse, error) {
 	out := new(FeedResponse)
-	err := c.cc.Invoke(ctx, "/VideoService/FeedBySearch", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/videoProto.VideoService/FeedBySearch", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -193,7 +193,7 @@ func _VideoService_Feed_Handler(srv interface{}, ctx context.Context, dec func(i
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/VideoService/Feed",
+		FullMethod: "/videoProto.VideoService/Feed",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(VideoServiceServer).Feed(ctx, req.(*FeedRequest))
@@ -211,7 +211,7 @@ func _VideoService_Publish_Handler(srv interface{}, ctx context.Context, dec fun
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/VideoService/Publish",
+		FullMethod: "/videoProto.VideoService/Publish",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(VideoServiceServer).Publish(ctx, req.(*PublishRequest))
@@ -229,7 +229,7 @@ func _VideoService_Video_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/VideoService/Video",
+		FullMethod: "/videoProto.VideoService/Video",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(VideoServiceServer).Video(ctx, req.(*VideoRequest))
@@ -247,7 +247,7 @@ func _VideoService_PublishList_Handler(srv interface{}, ctx context.Context, dec
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/VideoService/PublishList",
+		FullMethod: "/videoProto.VideoService/PublishList",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(VideoServiceServer).PublishList(ctx, req.(*PublishListRequest))
@@ -265,7 +265,7 @@ func _VideoService_FeedByTopic_Handler(srv interface{}, ctx context.Context, dec
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/VideoService/FeedByTopic",
+		FullMethod: "/videoProto.VideoService/FeedByTopic",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(VideoServiceServer).FeedByTopic(ctx, req.(*FeedByTopicRequest))
@@ -283,7 +283,7 @@ func _VideoService_CategoryList_Handler(srv interface{}, ctx context.Context, de
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/VideoService/CategoryList",
+		FullMethod: "/videoProto.VideoService/CategoryList",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(VideoServiceServer).CategoryList(ctx, req.(*emptypb.Empty))
@@ -301,7 +301,7 @@ func _VideoService_TopicList_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/VideoService/TopicList",
+		FullMethod: "/videoProto.VideoService/TopicList",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(VideoServiceServer).TopicList(ctx, req.(*emptypb.Empty))
@@ -319,7 +319,7 @@ func _VideoService_FeedByCategory_Handler(srv interface{}, ctx context.Context, 
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/VideoService/FeedByCategory",
+		FullMethod: "/videoProto.VideoService/FeedByCategory",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(VideoServiceServer).FeedByCategory(ctx, req.(*FeedByCategoryRequest))
@@ -337,7 +337,7 @@ func _VideoService_FeedBySearch_Handler(srv interface{}, ctx context.Context, de
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/VideoService/FeedBySearch",
+		FullMethod: "/videoProto.VideoService/FeedBySearch",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(VideoServiceServer).FeedBySearch(ctx, req.(*FeedBySearchRequest))
@@ -349,7 +349,7 @@ func _VideoService_FeedBySearch_Handler(srv interface{}, ctx context.Context, de
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var VideoService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "VideoService",
+	ServiceName: "videoProto.VideoService",
 	HandlerType: (*VideoServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

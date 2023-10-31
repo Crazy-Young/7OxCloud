@@ -1,7 +1,7 @@
 syntax = "proto3";
 import "google/protobuf/empty.proto";
-import "google/protobuf/timestamp.proto";
-option go_package = ".;proto";
+package videoProto;
+option go_package = ".;videoProto";
 
 service VideoService {
   rpc Feed (FeedRequest) returns (FeedResponse) {}
@@ -16,13 +16,13 @@ service VideoService {
 }
 
 message FeedRequest {
-  google.protobuf.Timestamp latestTime = 1;
+  int64 latestTime = 1;
   int64 currentUserId = 2;
 }
 
 message FeedResponse {
   repeated Video videos = 1;
-  google.protobuf.Timestamp nextTime = 2;
+  int64 nextTime = 2;
 }
 
 message PublishRequest {
@@ -63,7 +63,7 @@ message Video{
   bool isLike = 8;
   User author = 9;
   repeated Topic topics = 10;
-  google.protobuf.Timestamp publishTime = 11;
+  int64 publishTime = 11;
 }
 
 message MiniVideo{
@@ -87,7 +87,7 @@ message User {
 
 message FeedByTopicRequest {
   int64 topicId = 1;
-  google.protobuf.Timestamp latestTime = 2;
+  int64 latestTime = 2;
   int64 currentUserId = 3;
 }
 
@@ -106,12 +106,12 @@ message Category {
 
 message FeedByCategoryRequest {
   int64 categoryId = 1;
-  google.protobuf.Timestamp latestTime = 2;
+  int64 latestTime = 2;
   int64 currentUserId = 3;
 }
 
 message FeedBySearchRequest {
   string keyword = 1;
-  google.protobuf.Timestamp latestTime = 2;
+  int64 latestTime = 2;
   int64 currentUserId = 3;
 }

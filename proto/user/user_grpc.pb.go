@@ -4,7 +4,7 @@
 // - protoc             v4.24.0
 // source: user.proto
 
-package proto
+package userProto
 
 import (
 	context "context"
@@ -42,7 +42,7 @@ func NewUserServiceClient(cc grpc.ClientConnInterface) UserServiceClient {
 
 func (c *userServiceClient) CheckMobile(ctx context.Context, in *CheckMobileRequest, opts ...grpc.CallOption) (*CheckMobileResponse, error) {
 	out := new(CheckMobileResponse)
-	err := c.cc.Invoke(ctx, "/UserService/CheckMobile", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/userProto.UserService/CheckMobile", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +51,7 @@ func (c *userServiceClient) CheckMobile(ctx context.Context, in *CheckMobileRequ
 
 func (c *userServiceClient) Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error) {
 	out := new(RegisterResponse)
-	err := c.cc.Invoke(ctx, "/UserService/Register", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/userProto.UserService/Register", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +60,7 @@ func (c *userServiceClient) Register(ctx context.Context, in *RegisterRequest, o
 
 func (c *userServiceClient) LoginBySMS(ctx context.Context, in *LoginBySMSRequest, opts ...grpc.CallOption) (*LoginResponse, error) {
 	out := new(LoginResponse)
-	err := c.cc.Invoke(ctx, "/UserService/LoginBySMS", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/userProto.UserService/LoginBySMS", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func (c *userServiceClient) LoginBySMS(ctx context.Context, in *LoginBySMSReques
 
 func (c *userServiceClient) LoginByPassword(ctx context.Context, in *LoginByPasswordRequest, opts ...grpc.CallOption) (*LoginResponse, error) {
 	out := new(LoginResponse)
-	err := c.cc.Invoke(ctx, "/UserService/LoginByPassword", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/userProto.UserService/LoginByPassword", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +78,7 @@ func (c *userServiceClient) LoginByPassword(ctx context.Context, in *LoginByPass
 
 func (c *userServiceClient) GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserResponse, error) {
 	out := new(GetUserResponse)
-	err := c.cc.Invoke(ctx, "/UserService/GetUser", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/userProto.UserService/GetUser", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +87,7 @@ func (c *userServiceClient) GetUser(ctx context.Context, in *GetUserRequest, opt
 
 func (c *userServiceClient) UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/UserService/UpdateUser", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/userProto.UserService/UpdateUser", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +96,7 @@ func (c *userServiceClient) UpdateUser(ctx context.Context, in *UpdateUserReques
 
 func (c *userServiceClient) ResetPassword(ctx context.Context, in *ResetPasswordRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/UserService/ResetPassword", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/userProto.UserService/ResetPassword", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -165,7 +165,7 @@ func _UserService_CheckMobile_Handler(srv interface{}, ctx context.Context, dec 
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/UserService/CheckMobile",
+		FullMethod: "/userProto.UserService/CheckMobile",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).CheckMobile(ctx, req.(*CheckMobileRequest))
@@ -183,7 +183,7 @@ func _UserService_Register_Handler(srv interface{}, ctx context.Context, dec fun
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/UserService/Register",
+		FullMethod: "/userProto.UserService/Register",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).Register(ctx, req.(*RegisterRequest))
@@ -201,7 +201,7 @@ func _UserService_LoginBySMS_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/UserService/LoginBySMS",
+		FullMethod: "/userProto.UserService/LoginBySMS",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).LoginBySMS(ctx, req.(*LoginBySMSRequest))
@@ -219,7 +219,7 @@ func _UserService_LoginByPassword_Handler(srv interface{}, ctx context.Context, 
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/UserService/LoginByPassword",
+		FullMethod: "/userProto.UserService/LoginByPassword",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).LoginByPassword(ctx, req.(*LoginByPasswordRequest))
@@ -237,7 +237,7 @@ func _UserService_GetUser_Handler(srv interface{}, ctx context.Context, dec func
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/UserService/GetUser",
+		FullMethod: "/userProto.UserService/GetUser",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).GetUser(ctx, req.(*GetUserRequest))
@@ -255,7 +255,7 @@ func _UserService_UpdateUser_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/UserService/UpdateUser",
+		FullMethod: "/userProto.UserService/UpdateUser",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).UpdateUser(ctx, req.(*UpdateUserRequest))
@@ -273,7 +273,7 @@ func _UserService_ResetPassword_Handler(srv interface{}, ctx context.Context, de
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/UserService/ResetPassword",
+		FullMethod: "/userProto.UserService/ResetPassword",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).ResetPassword(ctx, req.(*ResetPasswordRequest))
@@ -285,7 +285,7 @@ func _UserService_ResetPassword_Handler(srv interface{}, ctx context.Context, de
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var UserService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "UserService",
+	ServiceName: "userProto.UserService",
 	HandlerType: (*UserServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

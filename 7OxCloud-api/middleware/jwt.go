@@ -11,10 +11,29 @@ import (
 	"go.uber.org/zap"
 )
 
+var visitWithoutLogin = gin.H{
+	"/api/user/get_user": true,
+
+	"/api/video/feed":             true,
+	"/api/video/get_video":        true,
+	"/api/video/publish_list":     true,
+	"/api/video/topic_list":       true,
+	"/api/video/category_list":    true,
+	"/api/video/feed_by_topic":    true,
+	"/api/video/feed_by_search":   true,
+	"/api/video/feed_by_category": true,
+}
+
 func JWTAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.Request.Header.Get("Authorization")
-		if token == "" {
+		if _, ok := visitWithoutLogin[c.Request.URL.Path]; ok {
+			if token == "" {
+				c.Set("userId", 0)
+				c.Next()
+				return
+			}
+		} else if token == "" {
 			zap.S().Info("请求未携带token，无权限访问")
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"code": 401,

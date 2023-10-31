@@ -6,7 +6,8 @@ type ApiConfig struct {
 	Tags []string `json:"tags"`
 }
 type ServiceConfig struct {
-	User string `json:"user"`
+	User  string `json:"user"`
+	Video string `json:"video"`
 }
 
 type JWTConfig struct {
@@ -53,7 +54,7 @@ type NacosConfig struct {
 	Host      string `mapstructure:"host"`
 	Port      int    `mapstructure:"port"`
 	Namespace string `mapstructure:"namespace"`
-	User      string `mapstructure:"user"`
+	User      string `mapstructure:"userService"`
 	Password  string `mapstructure:"password"`
 	DataId    string `mapstructure:"dataId"`
 	Group     string `mapstructure:"group"`
