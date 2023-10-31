@@ -1,7 +1,7 @@
 {
   "service": {
     "name": "VideoService",
-    "host": "113.54.236.108",
+    "host": "192.168.253.1",
     "tags": ["7OxCloud", "Video", "Service"]
   },
   "mysql": {

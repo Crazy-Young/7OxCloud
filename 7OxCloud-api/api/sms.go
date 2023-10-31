@@ -9,8 +9,8 @@ import (
 	"github.com/palp1tate/7OxCloud/7OxCloud-api/consts"
 	"github.com/palp1tate/7OxCloud/7OxCloud-api/form"
 	"github.com/palp1tate/7OxCloud/7OxCloud-api/global"
-	"github.com/palp1tate/7OxCloud/7OxCloud-api/proto"
 	"github.com/palp1tate/7OxCloud/7OxCloud-api/util"
+	"github.com/palp1tate/7OxCloud/proto/user"
 	"go.uber.org/zap"
 )
 
@@ -22,7 +22,7 @@ func SendSms(c *gin.Context) {
 	}
 	switch sendSmsForm.Type {
 	case consts.Register:
-		if res, err := global.UserServiceClient.CheckMobile(context.Background(), &proto.CheckMobileRequest{
+		if res, err := global.UserServiceClient.CheckMobile(context.Background(), &userProto.CheckMobileRequest{
 			Mobile: sendSmsForm.Mobile,
 		}); err != nil {
 			zap.S().Info("服务器内部错误")
@@ -34,7 +34,7 @@ func SendSms(c *gin.Context) {
 			return
 		}
 	default:
-		if res, err := global.UserServiceClient.CheckMobile(context.Background(), &proto.CheckMobileRequest{
+		if res, err := global.UserServiceClient.CheckMobile(context.Background(), &userProto.CheckMobileRequest{
 			Mobile: sendSmsForm.Mobile,
 		}); err != nil {
 			zap.S().Info("服务器内部错误")

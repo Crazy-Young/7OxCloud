@@ -4,8 +4,7 @@ import (
 	"fmt"
 
 	"github.com/palp1tate/7OxCloud/7OxCloud-srv/video/global"
-	"github.com/palp1tate/7OxCloud/7OxCloud-srv/video/model"
-
+	"github.com/palp1tate/7OxCloud/model"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"

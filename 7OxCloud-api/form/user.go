@@ -17,7 +17,7 @@ type RegisterForm struct {
 type UpdateUserForm struct {
 	Username  string `form:"username" json:"username" binding:"required,min=1,max=20"`
 	Age       int    `form:"age" json:"age" binding:"required,gt=0"`
-	Gender    int    `form:"gender" json:"gender" binding:"required,oneof=0 1"`
+	Gender    string `form:"gender" json:"gender" binding:"required,oneof=0 1"`
 	Location  string `form:"location" json:"location" binding:"required,max=20"`
 	Avatar    string `form:"avatar" json:"avatar" binding:"required"`
 	Signature string `form:"signature" json:"signature" binding:"required"`

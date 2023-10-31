@@ -3,10 +3,9 @@ package dao
 import (
 	"time"
 
-	"gorm.io/gorm"
-
 	"github.com/palp1tate/7OxCloud/7OxCloud-srv/video/global"
-	"github.com/palp1tate/7OxCloud/7OxCloud-srv/video/model"
+	"github.com/palp1tate/7OxCloud/model"
+	"gorm.io/gorm"
 )
 
 func GetVideos(latestTime time.Time) (videoList []*model.Video, err error) {
@@ -45,7 +44,9 @@ func GetIsLike(tx *gorm.DB, vid int64, uid int64) (isLike bool, err error) {
 }
 
 func FindAuthor(tx *gorm.DB, vid int64) (author model.User, err error) {
-	err = tx.Where("id = ?", vid).First(&author).Error
+	err = tx.Joins("join video on video.author_id = user.id").
+		Where("video.id = ?", vid).
+		First(&author).Error
 	return
 }
 
@@ -99,6 +100,14 @@ func CreateVideo(video *model.Video, topics []string, categoryId int64) (err err
 			tx.Rollback()
 			return
 		}
+		videoTopic := model.VideoTopic{
+			VideoId: video.ID,
+			TopicId: topicModel.ID,
+		}
+		if err = tx.Create(&videoTopic).Error; err != nil {
+			tx.Rollback()
+			return
+		}
 	}
 	videoCategory := model.VideoCategory{
 		VideoId:    video.ID,
@@ -131,7 +140,7 @@ func GetVideosByTopicId(latestTime time.Time, topicId int64) (videoList []*model
 }
 
 func GetCategories() (categoryList []*model.Category, err error) {
-	err = global.DB.Find(&categoryList).Error
+	err = global.DB.Order("id desc").Find(&categoryList).Error
 	return
 }
 

@@ -10,8 +10,8 @@ import (
 	"github.com/palp1tate/7OxCloud/7OxCloud-api/form"
 	"github.com/palp1tate/7OxCloud/7OxCloud-api/global"
 	"github.com/palp1tate/7OxCloud/7OxCloud-api/middleware"
-	"github.com/palp1tate/7OxCloud/7OxCloud-api/proto"
 	"github.com/palp1tate/7OxCloud/7OxCloud-api/util"
+	"github.com/palp1tate/7OxCloud/proto/user"
 	"go.uber.org/zap"
 )
 
@@ -32,7 +32,7 @@ func Register(c *gin.Context) {
 		}
 		global.RedisClient.Del(context.Background(), registerForm.Mobile)
 	}
-	res, err := global.UserServiceClient.Register(context.Background(), &proto.RegisterRequest{
+	res, err := global.UserServiceClient.Register(context.Background(), &userProto.RegisterRequest{
 		Mobile:   registerForm.Mobile,
 		Password: registerForm.Password,
 	})
@@ -66,7 +66,7 @@ func Login(c *gin.Context) {
 			HandleHttpResponse(c, http.StatusBadRequest, "验证码错误", nil, nil)
 			return
 		}
-		res, err := global.UserServiceClient.LoginByPassword(context.Background(), &proto.LoginByPasswordRequest{
+		res, err := global.UserServiceClient.LoginByPassword(context.Background(), &userProto.LoginByPasswordRequest{
 			Mobile:   loginForm.Mobile,
 			Password: loginForm.Password,
 		})
@@ -95,7 +95,7 @@ func Login(c *gin.Context) {
 			}
 			global.RedisClient.Del(context.Background(), loginForm.Mobile)
 		}
-		res, err := global.UserServiceClient.LoginBySMS(context.Background(), &proto.LoginBySMSRequest{
+		res, err := global.UserServiceClient.LoginBySMS(context.Background(), &userProto.LoginBySMSRequest{
 			Mobile: loginForm.Mobile,
 		})
 		if err != nil {
@@ -122,7 +122,7 @@ func GetUser(c *gin.Context) {
 	if uid == 0 {
 		uid = currentUserId
 	}
-	res, err := global.UserServiceClient.GetUser(context.Background(), &proto.GetUserRequest{
+	res, err := global.UserServiceClient.GetUser(context.Background(), &userProto.GetUserRequest{
 		Id:            uid,
 		CurrentUserId: currentUserId,
 	})
@@ -130,25 +130,13 @@ func GetUser(c *gin.Context) {
 		HandleGrpcErrorToHttp(c, err)
 		return
 	}
-	token := c.GetString("token")
-	j := middleware.NewJWT()
-	refreshedToken, _ := j.RefreshToken(token)
-	HandleHttpResponse(c, http.StatusOK, "获取用户信息成功", refreshedToken, gin.H{
-		"uid":          res.User.Id,
-		"username":     res.User.Username,
-		"location":     res.User.Location,
-		"age":          res.User.Age,
-		"avatar":       res.User.Avatar,
-		"gender":       res.User.Gender,
-		"signature":    res.User.Signature,
-		"isFollow":     res.User.IsFollow,
-		"followCount":  res.User.FollowCount,
-		"fanCount":     res.User.FanCount,
-		"likeCount":    res.User.LikeCount,
-		"likedCount":   res.User.LikedCount,
-		"workCount":    res.User.WorkCount,
-		"collectCount": res.User.CollectCount,
-	})
+	var refreshedToken interface{}
+	if currentUserId != 0 {
+		token := c.GetString("token")
+		j := middleware.NewJWT()
+		refreshedToken, _ = j.RefreshToken(token)
+	}
+	HandleHttpResponse(c, http.StatusOK, "获取用户信息成功", refreshedToken, UserToResponse(res.User))
 	return
 }
 
@@ -159,13 +147,13 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 	uid := int64(c.GetInt("userId"))
-	_, err := global.UserServiceClient.UpdateUser(context.Background(), &proto.UpdateUserRequest{
+	_, err := global.UserServiceClient.UpdateUser(context.Background(), &userProto.UpdateUserRequest{
 		Id:        uid,
 		Username:  updateUserForm.Username,
 		Location:  updateUserForm.Location,
 		Age:       int64(updateUserForm.Age),
 		Avatar:    updateUserForm.Avatar,
-		Gender:    int64(updateUserForm.Gender),
+		Gender:    util.String2Int64(updateUserForm.Gender),
 		Signature: updateUserForm.Signature,
 	})
 	if err != nil {
@@ -198,7 +186,7 @@ func ResetPassword(c *gin.Context) {
 		}
 		global.RedisClient.Del(context.Background(), resetPasswordForm.Mobile)
 	}
-	_, err = global.UserServiceClient.ResetPassword(context.Background(), &proto.ResetPasswordRequest{
+	_, err = global.UserServiceClient.ResetPassword(context.Background(), &userProto.ResetPasswordRequest{
 		Mobile:   resetPasswordForm.Mobile,
 		Password: resetPasswordForm.Password,
 	})

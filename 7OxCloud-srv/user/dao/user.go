@@ -2,7 +2,7 @@ package dao
 
 import (
 	"github.com/palp1tate/7OxCloud/7OxCloud-srv/user/global"
-	"github.com/palp1tate/7OxCloud/7OxCloud-srv/user/model"
+	"github.com/palp1tate/7OxCloud/model"
 	"gorm.io/gorm"
 )
 

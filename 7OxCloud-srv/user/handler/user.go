@@ -7,26 +7,26 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/palp1tate/7OxCloud/7OxCloud-srv/user/dao"
 	"github.com/palp1tate/7OxCloud/7OxCloud-srv/user/global"
-	"github.com/palp1tate/7OxCloud/7OxCloud-srv/user/model"
-	"github.com/palp1tate/7OxCloud/7OxCloud-srv/user/proto"
+	"github.com/palp1tate/7OxCloud/model"
+	"github.com/palp1tate/7OxCloud/proto/user"
 	"github.com/palp1tate/go-crypto-guard/pbkdf2"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
 type UserServer struct {
-	proto.UnimplementedUserServiceServer
+	userProto.UnimplementedUserServiceServer
 }
 
-func (s *UserServer) CheckMobile(ctx context.Context, req *proto.CheckMobileRequest) (*proto.CheckMobileResponse, error) {
+func (s *UserServer) CheckMobile(ctx context.Context, req *userProto.CheckMobileRequest) (*userProto.CheckMobileResponse, error) {
 	_, err := dao.FindUserByMobile(req.Mobile)
-	res := &proto.CheckMobileResponse{
+	res := &userProto.CheckMobileResponse{
 		Exist: err == nil,
 	}
 	return res, nil
 }
 
-func (s *UserServer) Register(ctx context.Context, req *proto.RegisterRequest) (*proto.RegisterResponse, error) {
+func (s *UserServer) Register(ctx context.Context, req *userProto.RegisterRequest) (*userProto.RegisterResponse, error) {
 	var user model.User
 	user, err := dao.FindUserByMobile(req.Mobile)
 	if err == nil {
@@ -42,13 +42,13 @@ func (s *UserServer) Register(ctx context.Context, req *proto.RegisterRequest) (
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "注册失败")
 	}
-	res := &proto.RegisterResponse{
+	res := &userProto.RegisterResponse{
 		Id: user.ID,
 	}
 	return res, nil
 }
 
-func (s *UserServer) LoginByPassword(ctx context.Context, req *proto.LoginByPasswordRequest) (*proto.LoginResponse, error) {
+func (s *UserServer) LoginByPassword(ctx context.Context, req *userProto.LoginByPasswordRequest) (*userProto.LoginResponse, error) {
 	user, err := dao.FindUserByMobile(req.Mobile)
 	if err != nil {
 		return nil, status.Errorf(codes.NotFound, "该手机号未注册")
@@ -56,32 +56,32 @@ func (s *UserServer) LoginByPassword(ctx context.Context, req *proto.LoginByPass
 	if ok, _ := pwd.VerifySHA512(req.Password, user.Password); !ok {
 		return nil, status.Errorf(codes.Unauthenticated, "密码错误")
 	}
-	res := &proto.LoginResponse{
+	res := &userProto.LoginResponse{
 		Id: user.ID,
 	}
 	return res, nil
 }
 
-func (s *UserServer) LoginBySMS(ctx context.Context, req *proto.LoginBySMSRequest) (*proto.LoginResponse, error) {
+func (s *UserServer) LoginBySMS(ctx context.Context, req *userProto.LoginBySMSRequest) (*userProto.LoginResponse, error) {
 	user, _ := dao.FindUserByMobile(req.Mobile)
-	res := &proto.LoginResponse{
+	res := &userProto.LoginResponse{
 		Id: user.ID,
 	}
 	return res, nil
 }
 
-func (s *UserServer) GetUser(ctx context.Context, req *proto.GetUserRequest) (*proto.GetUserResponse, error) {
+func (s *UserServer) GetUser(ctx context.Context, req *userProto.GetUserRequest) (*userProto.GetUserResponse, error) {
 	user, err := dao.FindUserById(req.Id)
 	if err != nil {
 		return nil, status.Errorf(codes.NotFound, "该用户不存在")
 	}
-	res := &proto.GetUserResponse{
+	res := &userProto.GetUserResponse{
 		User: UserModelToResponse(user, req.CurrentUserId),
 	}
 	return res, nil
 }
 
-func (s *UserServer) UpdateUser(ctx context.Context, req *proto.UpdateUserRequest) (*empty.Empty, error) {
+func (s *UserServer) UpdateUser(ctx context.Context, req *userProto.UpdateUserRequest) (*empty.Empty, error) {
 	user, err := dao.FindUserById(req.Id)
 	if err != nil {
 		return nil, status.Errorf(codes.NotFound, "该用户不存在")
@@ -99,7 +99,7 @@ func (s *UserServer) UpdateUser(ctx context.Context, req *proto.UpdateUserReques
 	return &empty.Empty{}, nil
 }
 
-func (s *UserServer) ResetPassword(ctx context.Context, req *proto.ResetPasswordRequest) (*empty.Empty, error) {
+func (s *UserServer) ResetPassword(ctx context.Context, req *userProto.ResetPasswordRequest) (*empty.Empty, error) {
 	user, err := dao.FindUserByMobile(req.Mobile)
 	if err != nil {
 		return nil, status.Errorf(codes.NotFound, "该手机号未注册")
@@ -112,7 +112,7 @@ func (s *UserServer) ResetPassword(ctx context.Context, req *proto.ResetPassword
 	return &empty.Empty{}, nil
 }
 
-func UserModelToResponse(user model.User, currentUserId int64) *proto.User {
+func UserModelToResponse(user model.User, currentUserId int64) *userProto.User {
 	tx := global.DB.Begin()
 	defer func() {
 		if r := recover(); r != nil {
@@ -130,7 +130,7 @@ func UserModelToResponse(user model.User, currentUserId int64) *proto.User {
 	if err := tx.Commit().Error; err != nil {
 		return nil
 	}
-	return &proto.User{
+	return &userProto.User{
 		Id:           user.ID,
 		Age:          int64(user.Age),
 		Username:     user.Username,

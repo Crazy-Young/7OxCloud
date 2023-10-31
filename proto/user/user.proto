@@ -1,6 +1,7 @@
 syntax = "proto3";
 import "google/protobuf/empty.proto";
-option go_package = ".;proto";
+package userProto;
+option go_package = ".;userProto";
 
 service UserService {
   rpc CheckMobile(CheckMobileRequest) returns (CheckMobileResponse) {}
