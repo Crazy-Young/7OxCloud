@@ -1,0 +1,18 @@
+{
+  "service": {
+    "name": "InteractionService",
+    "host": "113.54.245.226",
+    "tags": ["7OxCloud", "Interaction", "Service"]
+  },
+  "mysql": {
+    "host": "172.28.242.13",
+    "port": 3306,
+    "database": "7OxCloud",
+    "user": "root",
+    "password": "123456"
+  },
+  "consul": {
+    "host": "172.28.242.13",
+    "port": 8500
+  }
+}

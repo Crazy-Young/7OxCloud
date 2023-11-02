@@ -1,7 +1,7 @@
 {
   "service": {
     "name": "UserService",
-    "host": "192.168.253.1",
+    "host": "10.252.66.67",
     "tags": ["7OxCloud", "User", "Service"]
   },
   "mysql": {

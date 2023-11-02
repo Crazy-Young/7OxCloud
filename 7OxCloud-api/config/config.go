@@ -6,8 +6,10 @@ type ApiConfig struct {
 	Tags []string `json:"tags"`
 }
 type ServiceConfig struct {
-	User  string `json:"user"`
-	Video string `json:"video"`
+	User        string `json:"user"`
+	Video       string `json:"video"`
+	Interaction string `json:"interaction"`
+	Social      string `json:"social"`
 }
 
 type JWTConfig struct {

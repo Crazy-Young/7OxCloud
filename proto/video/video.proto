@@ -4,15 +4,17 @@ package videoProto;
 option go_package = ".;videoProto";
 
 service VideoService {
-  rpc Feed (FeedRequest) returns (FeedResponse) {}
+  rpc Feed (FeedRequest) returns (MiniFeedResponse) {}
   rpc Publish (PublishRequest) returns (google.protobuf.Empty) {}
   rpc Video (VideoRequest) returns (VideoResponse) {}
   rpc PublishList (PublishListRequest) returns (PublishListResponse) {}
   rpc FeedByTopic (FeedByTopicRequest) returns (FeedResponse) {}
   rpc CategoryList (google.protobuf.Empty) returns (CategoryListResponse) {}
   rpc TopicList (google.protobuf.Empty) returns (TopicListResponse) {}
-  rpc FeedByCategory (FeedByCategoryRequest) returns (FeedResponse) {}
+  rpc FeedByCategory (FeedByCategoryRequest) returns (MiniFeedResponse) {}
   rpc FeedBySearch (FeedBySearchRequest) returns (FeedResponse) {}
+  rpc HotFeed (FeedRequest) returns (MiniFeedResponse) {}
+  rpc DeleteVideo (VideoRequest) returns (google.protobuf.Empty) {}
 }
 
 message FeedRequest {
@@ -44,12 +46,18 @@ message VideoResponse {
 }
 
 message PublishListRequest {
-  int64 uid = 1;
-  int64 currentUserId = 2;
+  int64 userId = 1;
+  int64 latestTime = 2;
 }
 
 message PublishListResponse {
+  repeated SmallVideo videos = 1;
+  int64 nextTime = 2;
+}
+
+message MiniFeedResponse {
   repeated MiniVideo videos = 1;
+  int64 nextTime = 2;
 }
 
 message Video{
@@ -61,15 +69,30 @@ message Video{
   int64 commentCount = 6;
   int64 collectCount = 7;
   bool isLike = 8;
-  User author = 9;
-  repeated Topic topics = 10;
-  int64 publishTime = 11;
+  bool isCollect = 9;
+  User author = 10;
+  repeated Topic topics = 11;
+  int64 publishTime = 12;
 }
 
 message MiniVideo{
   int64 id = 1;
-  string coverUrl = 2;
-  int64 likeCount = 3;
+  string playUrl = 2;
+  string coverUrl = 3;
+  int64 likeCount = 4;
+  string description = 5;
+  repeated Topic topics = 6;
+  MiniUser author = 7;
+  int64 publishTime = 8;
+}
+
+message SmallVideo{
+  int64 id = 1;
+  string playUrl = 2;
+  string coverUrl = 3;
+  int64 likeCount = 4;
+  string description = 5;
+  repeated Topic topics = 6;
 }
 
 message Topic{
@@ -83,6 +106,12 @@ message User {
   string avatar = 3;
   string location = 4;
   bool isFollow = 5;
+}
+
+message MiniUser {
+  int64 id = 1;
+  string username = 2;
+  bool isFollow = 3;
 }
 
 message FeedByTopicRequest {

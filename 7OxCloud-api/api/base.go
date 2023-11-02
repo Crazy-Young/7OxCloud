@@ -5,10 +5,6 @@ import (
 	"net/http"
 	"strings"
 
-	videoProto "github.com/palp1tate/7OxCloud/proto/video"
-
-	userProto "github.com/palp1tate/7OxCloud/proto/user"
-
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/palp1tate/7OxCloud/7OxCloud-api/global"
@@ -56,57 +52,4 @@ func HandleHttpResponse(c *gin.Context, code int, msg interface{}, token interfa
 	}
 	c.JSON(code, h)
 	return
-}
-
-func UserToResponse(user *userProto.User) gin.H {
-	return gin.H{
-		"uid":          user.Id,
-		"username":     user.Username,
-		"location":     user.Location,
-		"age":          user.Age,
-		"avatar":       user.Avatar,
-		"gender":       user.Gender,
-		"signature":    user.Signature,
-		"isFollow":     user.IsFollow,
-		"followCount":  user.FollowCount,
-		"fanCount":     user.FanCount,
-		"likeCount":    user.LikeCount,
-		"likedCount":   user.LikedCount,
-		"workCount":    user.WorkCount,
-		"collectCount": user.CollectCount,
-	}
-}
-
-func MiniUserToResponse(user *videoProto.User) gin.H {
-	return gin.H{
-		"uid":      user.Id,
-		"username": user.Username,
-		"avatar":   user.Avatar,
-		"location": user.Location,
-		"isFollow": user.IsFollow,
-	}
-}
-
-func VideoToResponse(video *videoProto.Video) gin.H {
-	return gin.H{
-		"vid":          video.Id,
-		"description":  video.Description,
-		"playUrl":      video.PlayUrl,
-		"coverUrl":     video.CoverUrl,
-		"likeCount":    video.LikeCount,
-		"commentCount": video.CommentCount,
-		"collectCount": video.CollectCount,
-		"isLike":       video.IsLike,
-		"author":       MiniUserToResponse(video.Author),
-		"topics":       video.Topics,
-		"publishTime":  video.PublishTime,
-	}
-}
-
-func MiniVideoToResponse(video *videoProto.MiniVideo) gin.H {
-	return gin.H{
-		"vid":       video.Id,
-		"coverUrl":  video.CoverUrl,
-		"likeCount": video.LikeCount,
-	}
 }

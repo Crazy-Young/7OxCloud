@@ -1,0 +1,7 @@
+host: '172.28.242.13'
+port: 8848
+namespace: '6a11f263-64a0-4ca5-8b69-1259cd14dc87'
+user: 'nacos'
+password: 'nacos'
+dataId: 'InteractionService.json'
+group: 'dev'

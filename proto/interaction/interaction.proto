@@ -1,0 +1,99 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+package interactionProto;
+option go_package = ".;interactionProto";
+
+service InteractionService {
+  rpc LikeVideo(LikeVideoRequest) returns (google.protobuf.Empty) {}
+  rpc CancelLikeVideo(CancelLikeVideoRequest) returns (google.protobuf.Empty) {}
+  rpc GetLikeList(GetLikeListRequest) returns (FeedResponse) {}
+  rpc CollectVideo(CollectVideoRequest) returns (google.protobuf.Empty) {}
+  rpc CancelCollectVideo(CancelCollectVideoRequest) returns (google.protobuf.Empty) {}
+  rpc GetCollectList(GetCollectListRequest) returns (FeedResponse) {}
+  rpc Comment(CommentRequest) returns (google.protobuf.Empty) {}
+  rpc GetCommentList(GetCommentListRequest) returns (GetCommentListResponse) {}
+  rpc DeleteComment(DeleteCommentRequest) returns (google.protobuf.Empty) {}
+}
+
+message LikeVideoRequest{
+  int64 userId = 1;
+  int64 videoId = 2;
+}
+
+message CancelLikeVideoRequest{
+  int64 userId = 1;
+  int64 videoId = 2;
+}
+
+message GetLikeListRequest{
+  int64 userId = 1;
+  int64 latestTime = 2;
+}
+
+message CollectVideoRequest{
+  int64 userId = 1;
+  int64 videoId = 2;
+}
+
+message CancelCollectVideoRequest{
+  int64 userId = 1;
+  int64 videoId = 2;
+}
+
+message GetCollectListRequest{
+  int64 userId = 1;
+  int64 latestTime = 2;
+}
+
+message FeedResponse{
+  repeated SmallVideo videos = 1;
+  int64 nextTime = 2;
+}
+
+message SmallVideo{
+  int64 id = 1;
+  string playUrl = 2;
+  string coverUrl = 3;
+  int64 likeCount = 4;
+  string description = 5;
+  repeated Topic topics = 6;
+}
+
+message Topic{
+  int64 id = 1;
+  string description = 2;
+}
+
+message CommentRequest{
+  int64 userId = 1;
+  int64 videoId = 2;
+  string content = 3;
+  int64 parentId = 4;
+}
+
+message GetCommentListRequest{
+  int64 videoId = 1;
+}
+
+message GetCommentListResponse{
+  repeated Comment comments = 1;
+}
+
+message Comment{
+  int64 cid = 1;
+  string content = 2;
+  User author = 3;
+  int64 createdAt = 4;
+  repeated Comment children = 5;
+}
+message User{
+  int64 id = 1;
+  string username = 2;
+  string avatar = 3;
+  string location = 4;
+}
+
+message DeleteCommentRequest{
+  int64 userId = 1;
+  int64 commentId = 2;
+}

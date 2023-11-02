@@ -15,6 +15,7 @@ var visitWithoutLogin = gin.H{
 	"/api/user/get_user": true,
 
 	"/api/video/feed":             true,
+	"/api/video/hot_feed":         true,
 	"/api/video/get_video":        true,
 	"/api/video/publish_list":     true,
 	"/api/video/topic_list":       true,
@@ -22,6 +23,13 @@ var visitWithoutLogin = gin.H{
 	"/api/video/feed_by_topic":    true,
 	"/api/video/feed_by_search":   true,
 	"/api/video/feed_by_category": true,
+
+	"/api/interaction/like_list":    true,
+	"/api/interaction/collect_list": true,
+	"/api/interaction/comment_list": true,
+
+	"/api/social/following": true,
+	"/api/social/fan":       true,
 }
 
 func JWTAuth() gin.HandlerFunc {

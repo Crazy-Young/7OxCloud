@@ -2,16 +2,16 @@ package api
 
 import (
 	"net/http"
+	"strconv"
 	"time"
 
-	"github.com/golang/protobuf/ptypes/empty"
-
 	"github.com/gin-gonic/gin"
+	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/palp1tate/7OxCloud/7OxCloud-api/form"
 	"github.com/palp1tate/7OxCloud/7OxCloud-api/global"
 	"github.com/palp1tate/7OxCloud/7OxCloud-api/middleware"
-	"github.com/palp1tate/7OxCloud/7OxCloud-api/util"
 	"github.com/palp1tate/7OxCloud/proto/video"
+	"github.com/palp1tate/7OxCloud/util"
 )
 
 func Feed(c *gin.Context) {
@@ -30,7 +30,7 @@ func Feed(c *gin.Context) {
 	}
 	videos := make([]gin.H, len(res.Videos))
 	for i, video := range res.Videos {
-		videos[i] = VideoToResponse(video)
+		videos[i] = MiniVideoToResponse(video)
 	}
 	var refreshedToken interface{}
 	if currentUserId != 0 {
@@ -39,6 +39,36 @@ func Feed(c *gin.Context) {
 		refreshedToken, _ = j.RefreshToken(token)
 	}
 	HandleHttpResponse(c, http.StatusOK, "获取视频流成功", refreshedToken, gin.H{
+		"videos":   videos,
+		"nextTime": res.NextTime,
+	})
+}
+
+func HotFeed(c *gin.Context) {
+	latestTime := util.String2Int64(c.Query("latestTime"))
+	if latestTime == 0 {
+		latestTime = time.Now().Unix()
+	}
+	currentUserId := c.GetInt("userId")
+	res, err := global.VideoServiceClient.HotFeed(c, &videoProto.FeedRequest{
+		LatestTime:    latestTime,
+		CurrentUserId: int64(currentUserId),
+	})
+	if err != nil {
+		HandleGrpcErrorToHttp(c, err)
+		return
+	}
+	videos := make([]gin.H, len(res.Videos))
+	for i, video := range res.Videos {
+		videos[i] = MiniVideoToResponse(video)
+	}
+	var refreshedToken interface{}
+	if currentUserId != 0 {
+		token := c.GetString("token")
+		j := middleware.NewJWT()
+		refreshedToken, _ = j.RefreshToken(token)
+	}
+	HandleHttpResponse(c, http.StatusOK, "获取热门视频流成功", refreshedToken, gin.H{
 		"videos":   videos,
 		"nextTime": res.NextTime,
 	})
@@ -93,14 +123,18 @@ func GetVideo(c *gin.Context) {
 }
 
 func PublishList(c *gin.Context) {
+	latestTime := util.String2Int64(c.Query("latestTime"))
+	if latestTime == 0 {
+		latestTime = time.Now().Unix()
+	}
 	uid := util.String2Int64(c.Query("uid"))
 	currentUserId := c.GetInt("userId")
 	if uid == 0 {
 		uid = int64(currentUserId)
 	}
 	res, err := global.VideoServiceClient.PublishList(c, &videoProto.PublishListRequest{
-		Uid:           uid,
-		CurrentUserId: int64(currentUserId),
+		UserId:     uid,
+		LatestTime: latestTime,
 	})
 	if err != nil {
 		HandleGrpcErrorToHttp(c, err)
@@ -108,7 +142,7 @@ func PublishList(c *gin.Context) {
 	}
 	videos := make([]gin.H, len(res.Videos))
 	for i, video := range res.Videos {
-		videos[i] = MiniVideoToResponse(video)
+		videos[i] = SmallVideoToResponse(video)
 	}
 	var refreshedToken interface{}
 	if currentUserId != 0 {
@@ -117,7 +151,8 @@ func PublishList(c *gin.Context) {
 		refreshedToken, _ = j.RefreshToken(token)
 	}
 	HandleHttpResponse(c, http.StatusOK, "获取视频发布列表成功", refreshedToken, gin.H{
-		"videos": videos,
+		"videos":   videos,
+		"nextTime": res.NextTime,
 	})
 }
 
@@ -134,9 +169,7 @@ func TopicList(c *gin.Context) {
 		j := middleware.NewJWT()
 		refreshedToken, _ = j.RefreshToken(token)
 	}
-	HandleHttpResponse(c, http.StatusOK, "获取话题列表成功", refreshedToken, gin.H{
-		"topics": res.Topics,
-	})
+	HandleHttpResponse(c, http.StatusOK, "获取话题列表成功", refreshedToken, res.Topics)
 }
 
 func CategoryList(c *gin.Context) {
@@ -152,9 +185,7 @@ func CategoryList(c *gin.Context) {
 		j := middleware.NewJWT()
 		refreshedToken, _ = j.RefreshToken(token)
 	}
-	HandleHttpResponse(c, http.StatusOK, "获取分类列表成功", refreshedToken, gin.H{
-		"categories": res.Categories,
-	})
+	HandleHttpResponse(c, http.StatusOK, "获取分类列表成功", refreshedToken, res.Categories)
 }
 
 func FeedByTopic(c *gin.Context) {
@@ -215,7 +246,7 @@ func FeedByCategory(c *gin.Context) {
 	}
 	videos := make([]gin.H, len(res.Videos))
 	for i, video := range res.Videos {
-		videos[i] = VideoToResponse(video)
+		videos[i] = MiniVideoToResponse(video)
 	}
 	var refreshedToken interface{}
 	if currentUserId != 0 {
@@ -263,4 +294,84 @@ func FeedBySearch(c *gin.Context) {
 		"videos":   videos,
 		"nextTime": res.NextTime,
 	})
+}
+
+func DeleteVideo(c *gin.Context) {
+	videoId := util.String2Int64(c.Query("vid"))
+	if videoId == 0 {
+		HandleHttpResponse(c, http.StatusBadRequest, "vid不能为空", nil, nil)
+		return
+	}
+	currentUserId := c.GetInt("userId")
+	_, err := global.VideoServiceClient.DeleteVideo(c, &videoProto.VideoRequest{
+		Id:            videoId,
+		CurrentUserId: int64(currentUserId),
+	})
+	if err != nil {
+		HandleGrpcErrorToHttp(c, err)
+		return
+	}
+	token := c.GetString("token")
+	j := middleware.NewJWT()
+	refreshedToken, _ := j.RefreshToken(token)
+	HandleHttpResponse(c, http.StatusOK, "删除视频成功", refreshedToken, nil)
+}
+
+func User2Response(user *videoProto.User) gin.H {
+	return gin.H{
+		"uid":      user.Id,
+		"username": user.Username,
+		"avatar":   user.Avatar,
+		"location": user.Location,
+		"isFollow": user.IsFollow,
+	}
+}
+
+func MiniUserToResponse(user *videoProto.MiniUser) gin.H {
+	return gin.H{
+		"uid":      user.Id,
+		"username": user.Username,
+		"isFollow": user.IsFollow,
+	}
+}
+
+func VideoToResponse(video *videoProto.Video) gin.H {
+	return gin.H{
+		"vid":          strconv.FormatInt(video.Id, 10),
+		"description":  video.Description,
+		"playUrl":      video.PlayUrl,
+		"coverUrl":     video.CoverUrl,
+		"likeCount":    video.LikeCount,
+		"commentCount": video.CommentCount,
+		"collectCount": video.CollectCount,
+		"isLike":       video.IsLike,
+		"isCollect":    video.IsCollect,
+		"author":       User2Response(video.Author),
+		"topics":       video.Topics,
+		"publishTime":  video.PublishTime,
+	}
+}
+
+func MiniVideoToResponse(video *videoProto.MiniVideo) gin.H {
+	return gin.H{
+		"vid":         strconv.FormatInt(video.Id, 10),
+		"playUrl":     video.PlayUrl,
+		"coverUrl":    video.CoverUrl,
+		"likeCount":   video.LikeCount,
+		"description": video.Description,
+		"topics":      video.Topics,
+		"author":      MiniUserToResponse(video.Author),
+		"publishTime": video.PublishTime,
+	}
+}
+
+func SmallVideoToResponse(video *videoProto.SmallVideo) gin.H {
+	return gin.H{
+		"vid":         strconv.FormatInt(video.Id, 10),
+		"playUrl":     video.PlayUrl,
+		"coverUrl":    video.CoverUrl,
+		"likeCount":   video.LikeCount,
+		"description": video.Description,
+		"topics":      video.Topics,
+	}
 }

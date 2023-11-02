@@ -10,7 +10,7 @@ import (
 
 	"github.com/palp1tate/7OxCloud/7OxCloud-srv/video/global"
 	"github.com/palp1tate/7OxCloud/7OxCloud-srv/video/initialize"
-	"github.com/palp1tate/7OxCloud/7OxCloud-srv/video/util"
+	"github.com/palp1tate/7OxCloud/util"
 	"go.uber.org/zap"
 )
 

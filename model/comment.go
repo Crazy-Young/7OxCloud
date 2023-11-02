@@ -14,3 +14,11 @@ type Comment struct {
 	Parent   *Comment `gorm:"foreignKey:ParentId;AssociationForeignKey:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	Content  string   `gorm:"not null;size:1024"`
 }
+
+type CommentTree struct {
+	CommentId int            `json:"cid"`
+	Content   string         `json:"content"`
+	Author    User           `json:"author"`
+	CreatedAt int64          `json:"createdAt"`
+	Children  []*CommentTree `json:"children"`
+}
