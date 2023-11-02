@@ -10,8 +10,8 @@ import (
 	"github.com/palp1tate/7OxCloud/7OxCloud-api/form"
 	"github.com/palp1tate/7OxCloud/7OxCloud-api/global"
 	"github.com/palp1tate/7OxCloud/7OxCloud-api/middleware"
-	"github.com/palp1tate/7OxCloud/7OxCloud-api/util"
 	"github.com/palp1tate/7OxCloud/proto/user"
+	"github.com/palp1tate/7OxCloud/util"
 	"go.uber.org/zap"
 )
 
@@ -196,4 +196,23 @@ func ResetPassword(c *gin.Context) {
 	}
 	HandleHttpResponse(c, http.StatusOK, "修改密码成功", nil, nil)
 	return
+}
+
+func UserToResponse(user *userProto.User) gin.H {
+	return gin.H{
+		"uid":          user.Id,
+		"username":     user.Username,
+		"location":     user.Location,
+		"age":          user.Age,
+		"avatar":       user.Avatar,
+		"gender":       user.Gender,
+		"signature":    user.Signature,
+		"isFollow":     user.IsFollow,
+		"followCount":  user.FollowCount,
+		"fanCount":     user.FanCount,
+		"likeCount":    user.LikeCount,
+		"likedCount":   user.LikedCount,
+		"workCount":    user.WorkCount,
+		"collectCount": user.CollectCount,
+	}
 }

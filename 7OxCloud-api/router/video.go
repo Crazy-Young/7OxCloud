@@ -7,16 +7,18 @@ import (
 )
 
 func InitVideoRouter(Router *gin.RouterGroup) {
-	VideoRouter := Router.Group("/video")
+	VideoRouter := Router.Group("/video", middleware.JWTAuth())
 	{
-		VideoRouter.GET("/feed", middleware.JWTAuth(), api.Feed)
-		VideoRouter.POST("/publish", middleware.JWTAuth(), api.Publish)
-		VideoRouter.GET("/get_video", middleware.JWTAuth(), api.GetVideo)
-		VideoRouter.GET("/publish_list", middleware.JWTAuth(), api.PublishList)
-		VideoRouter.GET("/topic_list", middleware.JWTAuth(), api.TopicList)
-		VideoRouter.GET("/category_list", middleware.JWTAuth(), api.CategoryList)
-		VideoRouter.GET("/feed_by_topic", middleware.JWTAuth(), api.FeedByTopic)
-		VideoRouter.GET("/feed_by_category", middleware.JWTAuth(), api.FeedByCategory)
-		VideoRouter.GET("/feed_by_search", middleware.JWTAuth(), api.FeedBySearch)
+		VideoRouter.GET("/feed", api.Feed)
+		VideoRouter.POST("/publish", api.Publish)
+		VideoRouter.GET("/get_video", api.GetVideo)
+		VideoRouter.GET("/publish_list", api.PublishList)
+		VideoRouter.GET("/topic_list", api.TopicList)
+		VideoRouter.GET("/category_list", api.CategoryList)
+		VideoRouter.GET("/feed_by_topic", api.FeedByTopic)
+		VideoRouter.GET("/feed_by_category", api.FeedByCategory)
+		VideoRouter.GET("/feed_by_search", api.FeedBySearch)
+		VideoRouter.GET("/hot_feed", api.HotFeed)
+		VideoRouter.DELETE("/delete_video", api.DeleteVideo)
 	}
 }

@@ -5,6 +5,6 @@ import (
 )
 
 func String2Int64(str string) int64 {
-	str2int, _ := strconv.Atoi(str)
-	return int64(str2int)
+	result, _ := strconv.ParseInt(str, 10, 64)
+	return result
 }

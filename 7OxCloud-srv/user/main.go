@@ -10,7 +10,7 @@ import (
 
 	"github.com/palp1tate/7OxCloud/7OxCloud-srv/user/global"
 	"github.com/palp1tate/7OxCloud/7OxCloud-srv/user/initialize"
-	"github.com/palp1tate/7OxCloud/7OxCloud-srv/user/util"
+	"github.com/palp1tate/7OxCloud/util"
 	"go.uber.org/zap"
 )
 

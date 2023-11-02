@@ -26,6 +26,8 @@ func Routers() *gin.Engine {
 	router.InitBaseRouter(ApiGroup)
 	router.InitUserRouter(ApiGroup)
 	router.InitVideoRouter(ApiGroup)
+	router.InitInteractionRouter(ApiGroup)
+	router.InitSocialRouter(ApiGroup)
 
 	return Router
 }

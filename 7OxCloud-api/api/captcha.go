@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/palp1tate/7OxCloud/7OxCloud-api/util"
+	"github.com/palp1tate/7OxCloud/util"
 	"go.uber.org/zap"
 )
 

@@ -23,15 +23,17 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type VideoServiceClient interface {
-	Feed(ctx context.Context, in *FeedRequest, opts ...grpc.CallOption) (*FeedResponse, error)
+	Feed(ctx context.Context, in *FeedRequest, opts ...grpc.CallOption) (*MiniFeedResponse, error)
 	Publish(ctx context.Context, in *PublishRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	Video(ctx context.Context, in *VideoRequest, opts ...grpc.CallOption) (*VideoResponse, error)
 	PublishList(ctx context.Context, in *PublishListRequest, opts ...grpc.CallOption) (*PublishListResponse, error)
 	FeedByTopic(ctx context.Context, in *FeedByTopicRequest, opts ...grpc.CallOption) (*FeedResponse, error)
 	CategoryList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*CategoryListResponse, error)
 	TopicList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*TopicListResponse, error)
-	FeedByCategory(ctx context.Context, in *FeedByCategoryRequest, opts ...grpc.CallOption) (*FeedResponse, error)
+	FeedByCategory(ctx context.Context, in *FeedByCategoryRequest, opts ...grpc.CallOption) (*MiniFeedResponse, error)
 	FeedBySearch(ctx context.Context, in *FeedBySearchRequest, opts ...grpc.CallOption) (*FeedResponse, error)
+	HotFeed(ctx context.Context, in *FeedRequest, opts ...grpc.CallOption) (*MiniFeedResponse, error)
+	DeleteVideo(ctx context.Context, in *VideoRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type videoServiceClient struct {
@@ -42,8 +44,8 @@ func NewVideoServiceClient(cc grpc.ClientConnInterface) VideoServiceClient {
 	return &videoServiceClient{cc}
 }
 
-func (c *videoServiceClient) Feed(ctx context.Context, in *FeedRequest, opts ...grpc.CallOption) (*FeedResponse, error) {
-	out := new(FeedResponse)
+func (c *videoServiceClient) Feed(ctx context.Context, in *FeedRequest, opts ...grpc.CallOption) (*MiniFeedResponse, error) {
+	out := new(MiniFeedResponse)
 	err := c.cc.Invoke(ctx, "/videoProto.VideoService/Feed", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -105,8 +107,8 @@ func (c *videoServiceClient) TopicList(ctx context.Context, in *emptypb.Empty, o
 	return out, nil
 }
 
-func (c *videoServiceClient) FeedByCategory(ctx context.Context, in *FeedByCategoryRequest, opts ...grpc.CallOption) (*FeedResponse, error) {
-	out := new(FeedResponse)
+func (c *videoServiceClient) FeedByCategory(ctx context.Context, in *FeedByCategoryRequest, opts ...grpc.CallOption) (*MiniFeedResponse, error) {
+	out := new(MiniFeedResponse)
 	err := c.cc.Invoke(ctx, "/videoProto.VideoService/FeedByCategory", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -123,19 +125,39 @@ func (c *videoServiceClient) FeedBySearch(ctx context.Context, in *FeedBySearchR
 	return out, nil
 }
 
+func (c *videoServiceClient) HotFeed(ctx context.Context, in *FeedRequest, opts ...grpc.CallOption) (*MiniFeedResponse, error) {
+	out := new(MiniFeedResponse)
+	err := c.cc.Invoke(ctx, "/videoProto.VideoService/HotFeed", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *videoServiceClient) DeleteVideo(ctx context.Context, in *VideoRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/videoProto.VideoService/DeleteVideo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // VideoServiceServer is the server API for VideoService service.
 // All implementations must embed UnimplementedVideoServiceServer
 // for forward compatibility
 type VideoServiceServer interface {
-	Feed(context.Context, *FeedRequest) (*FeedResponse, error)
+	Feed(context.Context, *FeedRequest) (*MiniFeedResponse, error)
 	Publish(context.Context, *PublishRequest) (*emptypb.Empty, error)
 	Video(context.Context, *VideoRequest) (*VideoResponse, error)
 	PublishList(context.Context, *PublishListRequest) (*PublishListResponse, error)
 	FeedByTopic(context.Context, *FeedByTopicRequest) (*FeedResponse, error)
 	CategoryList(context.Context, *emptypb.Empty) (*CategoryListResponse, error)
 	TopicList(context.Context, *emptypb.Empty) (*TopicListResponse, error)
-	FeedByCategory(context.Context, *FeedByCategoryRequest) (*FeedResponse, error)
+	FeedByCategory(context.Context, *FeedByCategoryRequest) (*MiniFeedResponse, error)
 	FeedBySearch(context.Context, *FeedBySearchRequest) (*FeedResponse, error)
+	HotFeed(context.Context, *FeedRequest) (*MiniFeedResponse, error)
+	DeleteVideo(context.Context, *VideoRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedVideoServiceServer()
 }
 
@@ -143,7 +165,7 @@ type VideoServiceServer interface {
 type UnimplementedVideoServiceServer struct {
 }
 
-func (UnimplementedVideoServiceServer) Feed(context.Context, *FeedRequest) (*FeedResponse, error) {
+func (UnimplementedVideoServiceServer) Feed(context.Context, *FeedRequest) (*MiniFeedResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Feed not implemented")
 }
 func (UnimplementedVideoServiceServer) Publish(context.Context, *PublishRequest) (*emptypb.Empty, error) {
@@ -164,11 +186,17 @@ func (UnimplementedVideoServiceServer) CategoryList(context.Context, *emptypb.Em
 func (UnimplementedVideoServiceServer) TopicList(context.Context, *emptypb.Empty) (*TopicListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method TopicList not implemented")
 }
-func (UnimplementedVideoServiceServer) FeedByCategory(context.Context, *FeedByCategoryRequest) (*FeedResponse, error) {
+func (UnimplementedVideoServiceServer) FeedByCategory(context.Context, *FeedByCategoryRequest) (*MiniFeedResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FeedByCategory not implemented")
 }
 func (UnimplementedVideoServiceServer) FeedBySearch(context.Context, *FeedBySearchRequest) (*FeedResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FeedBySearch not implemented")
+}
+func (UnimplementedVideoServiceServer) HotFeed(context.Context, *FeedRequest) (*MiniFeedResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method HotFeed not implemented")
+}
+func (UnimplementedVideoServiceServer) DeleteVideo(context.Context, *VideoRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteVideo not implemented")
 }
 func (UnimplementedVideoServiceServer) mustEmbedUnimplementedVideoServiceServer() {}
 
@@ -345,6 +373,42 @@ func _VideoService_FeedBySearch_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _VideoService_HotFeed_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FeedRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VideoServiceServer).HotFeed(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/videoProto.VideoService/HotFeed",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VideoServiceServer).HotFeed(ctx, req.(*FeedRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VideoService_DeleteVideo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VideoRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VideoServiceServer).DeleteVideo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/videoProto.VideoService/DeleteVideo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VideoServiceServer).DeleteVideo(ctx, req.(*VideoRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // VideoService_ServiceDesc is the grpc.ServiceDesc for VideoService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -387,6 +451,14 @@ var VideoService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "FeedBySearch",
 			Handler:    _VideoService_FeedBySearch_Handler,
+		},
+		{
+			MethodName: "HotFeed",
+			Handler:    _VideoService_HotFeed_Handler,
+		},
+		{
+			MethodName: "DeleteVideo",
+			Handler:    _VideoService_DeleteVideo_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
