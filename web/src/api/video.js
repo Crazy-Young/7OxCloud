@@ -139,30 +139,33 @@ export const cancelUserVideo = () => {
 /**
  * 获取用户视频列表
  * @param {Number} uid 用户ID
+ * @param {Number} last 最新时间
  * @returns {Promise}
  * @memberof Video
  */
-export const VideoPublishList = (uid) => request.get('/video/publish_list' + (uid ? `?uid=${uid}` : ''), {
+export const VideoPublishList = (uid, last) => request.get('/video/publish_list' + (uid ? `?uid=${uid}&latestTime=${last}` : ''), {
     cancelToken: UserVideoCancelToken.token
 })
 
 /**
  * 点赞视频列表
  * @param {Number} uid 用户ID
+ * @param {Number} last 最新时间
  * @returns {Promise}
  * @memberof Video
  */
-export const LikeVideoList = (uid) => request.get('/interaction/like_list' + (uid ? `?uid=${uid}` : ''), {
+export const LikeVideoList = (uid, last) => request.get('/interaction/like_list' + (uid ? `?uid=${uid}&latestTime=${last}` : ''), {
     cancelToken: UserVideoCancelToken.token
 })
 
 /**
  * 收藏视频列表
  * @param {Number} uid 用户ID
+ * @param {Number} last 最新时间
  * @returns {Promise}
  * @memberof Video
  */
-export const CollectVideoList = (uid) => request.get('/interaction/collect_list' + (uid ? `?uid=${uid}` : ''), {
+export const CollectVideoList = (uid, last) => request.get('/interaction/collect_list' + (uid ? `?uid=${uid}&latestTime=${last}` : ''), {
     cancelToken: UserVideoCancelToken.token
 })
 

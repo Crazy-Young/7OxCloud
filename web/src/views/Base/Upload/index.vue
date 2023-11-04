@@ -247,7 +247,7 @@ export default {
                 }
                 const fn = () => {
                     if (this.form.videos[0].url.includes("blob:") || this.form.imgs[0].url.includes("blob:")) {
-                        this.fn()
+                        fn()
                         return
                     }
                     const form = {
@@ -262,6 +262,9 @@ export default {
                             this.$message.success(res.data.msg)
                             this.$refs.form.resetFields()
                             this.initForm()
+                            setTimeout(() => {
+                                this.$router.push({ name: "Home" })
+                            }, 300)
                         } else {
                             this.$message.error(res.data.msg)
                         }

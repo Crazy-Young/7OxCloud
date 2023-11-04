@@ -15,7 +15,7 @@ const actions = {
         return new Promise((resolve, reject) => {
             VideoCategoryList().then(res => {
                 if (res.status === 200) {
-                    const categories = res.data.data || []
+                    const categories = (res.data.data || []).sort((a, b) => b.id - a.id)
                     commit('GET_CATEGORYLIST', categories)
                     resolve(categories)
                 } else {

@@ -35,7 +35,7 @@
             </div>
             <!-- 输入框: 自适应高度，限制300个字符 -->
             <el-input type="textarea" autosize resize="none" v-model="input" maxlength="300" ref="input"
-                @keydown.native.enter.prevent="submit" :disabled="!userInfo.uid" @click="toggleLogin">
+                @keydown.native.enter.prevent="submit" :disabled="!userInfo.uid" @click.native="toggleLogin">
             </el-input>
             <!-- 提交图标 -->
             <div class="comment-window-footer-submit" v-if="input.trim()" @click="submit">
@@ -97,7 +97,8 @@ export default {
     methods: {
         // 切换登录
         toggleLogin() {
-            this.$bus.$emit("toggleLogin")
+            if (!this.userInfo.uid)
+                this.$bus.$emit("toggleLogin")
         },
         // 提交评论
         async submit() {
