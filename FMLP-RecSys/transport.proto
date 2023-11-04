@@ -1,0 +1,21 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+package transportProto;
+option go_package = ".;transportProto";
+
+service TransportService {
+  rpc SendCSVFile (SendRequest) returns (google.protobuf.Empty) {}
+  rpc GetRecommendedFeed(GetRecommendedFeedRequest) returns (GetRecommendedFeedResponse) {}
+}
+
+message SendRequest {
+  bytes csv = 1;
+}
+
+message GetRecommendedFeedRequest {
+  int64 userId = 1;
+}
+
+message GetRecommendedFeedResponse {
+  repeated int64 videoId = 1;
+}
