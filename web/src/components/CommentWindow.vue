@@ -10,7 +10,8 @@
             </span>
         </header>
         <!-- 评论内容: 如果没有评论且未加载中，显示没有评论 -->
-        <main class="comment-window-main" :class="{ 'no-comment': !commentList.length && !loading, 'center': loading && !commentList.length }">
+        <main class="comment-window-main"
+            :class="{ 'no-comment': !commentList.length && !loading, 'center': loading && !commentList.length }">
             <!-- 加载图标: 加载中且没有评论时出现 -->
             <Loading v-if="loading && !commentList.length"></Loading>
             <!-- 评论列表 -->
@@ -34,7 +35,7 @@
             </div>
             <!-- 输入框: 自适应高度，限制300个字符 -->
             <el-input type="textarea" autosize resize="none" v-model="input" maxlength="300" ref="input"
-                @keydown.native.enter.prevent="submit">
+                @keydown.native.enter.prevent="submit" :disabled="!userInfo.uid" @click="toggleLogin">
             </el-input>
             <!-- 提交图标 -->
             <div class="comment-window-footer-submit" v-if="input.trim()" @click="submit">
@@ -51,6 +52,7 @@ import { VideoCommentList, CommentVideo } from "@/api/video";
 import flattenData from "@/utils/flattenData";
 import CommentItem from "@/components/CommentItem.vue";
 import Loading from "./Loading.vue";
+import { mapState } from "vuex";
 export default {
     name: "CommentWindow",
     components: {
@@ -58,6 +60,11 @@ export default {
         SubmitIcon,
         CommentItem,
         Loading
+    },
+    computed: {
+        ...mapState({
+            userInfo: state => state.user.userInfo
+        })
     },
     props: {
         // 评论背景: 视频封面
@@ -88,6 +95,10 @@ export default {
         }
     },
     methods: {
+        // 切换登录
+        toggleLogin() {
+            this.$bus.$emit("toggleLogin")
+        },
         // 提交评论
         async submit() {
             // 发送评论

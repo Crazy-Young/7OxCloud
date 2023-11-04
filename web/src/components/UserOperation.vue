@@ -34,33 +34,42 @@ export default {
     name: "UserOperation",
     methods: {
         async handleLike() {
-            await LikeVideo({
+            const res = await LikeVideo({
                 vid: this.vid,
                 type: !this.m_isLike ? 1 : 2
             });
-            this.m_likeCount += this.m_isLike ? -1 : 1
-            this.m_isLike = !this.m_isLike
-            this.$emit("handleLike", this.vid);
+            if (!res) return
+            if (res.status === 200) {
+                this.m_likeCount += this.m_isLike ? -1 : 1
+                this.m_isLike = !this.m_isLike
+                this.$emit("handleLike", this.vid);
+            }
         },
         handleComment() {
             this.$emit("handleComment", this.vid);
         },
         async handleCollect() {
-            await CollectVideo({
+            const res = await CollectVideo({
                 vid: this.vid,
                 type: !this.m_isCollect ? 1 : 2
             })
-            this.m_collectCount += this.m_isCollect ? -1 : 1
-            this.m_isCollect = !this.m_isCollect
-            this.$emit("handleCollect", this.vid);
+            if (!res) return
+            if (res.status === 200) {
+                this.m_collectCount += this.m_isCollect ? -1 : 1
+                this.m_isCollect = !this.m_isCollect
+                this.$emit("handleCollect", this.vid);
+            }
         },
         async handleFollow() {
-            await FollowUser({
+            const res = await FollowUser({
                 userId: this.uid,
                 type: !this.m_isFollow ? 1 : 2
             })
-            this.m_isFollow = !this.m_isFollow
-            this.$emit("handleFollow", this.uid);
+            if (!res) return
+            if (res.status === 200) {
+                this.m_isFollow = !this.m_isFollow
+                this.$emit("handleFollow", this.uid);
+            }
         },
         changeCommentCount(count) {
             this.m_commentCount = count

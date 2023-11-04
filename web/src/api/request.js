@@ -8,7 +8,6 @@ let cancelToken = axios.CancelToken.source()
 // 创建axios实例
 const request = axios.create({
     baseURL: process.env.VUE_APP_API_BASE_URL,
-    timeout: 10000,
     cancelToken: cancelToken.token
 })
 
@@ -34,6 +33,8 @@ request.interceptors.response.use((response) => {
         removeToken();
         // 派发退出事件，清除当前用户数据
         Vue.prototype.$store?.dispatch('UserLogout');
+        // 唤起登录框
+        Vue.prototype.$bus.$emit('toggleLogin');
         return Promise.reject(error.response.data.msg);
     }
     return error.response

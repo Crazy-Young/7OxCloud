@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <h1 class="title">发布视频</h1>
-        <el-form class="upload-container" ref="form" @submit.prevent="submit" :model="form">
+        <el-form class="upload-container" ref="form" @submit.prevent="submit" :model="form" :rules="rules">
             <el-form-item prop="video">
                 <el-upload class="upload upload-video" ref="video" :file-list="form.videos" :disabled="isSubmit"
                     :http-request="handleVideoUpload" :on-change="handleVideoChange" :on-remove="handleVideoRemove" drag
@@ -13,7 +13,7 @@
 
             <el-form-item prop="desc">
                 <template #label>
-                    <span><i class="required">*</i>作品描述</span>
+                    <span>作品描述</span>
                     <i class="count">{{ form.desc.length }}/300</i>
                 </template>
                 <el-input :disabled="isSubmit" type="textarea" rows="5" autosize v-model="form.desc" resize="none"
@@ -34,7 +34,7 @@
 
             <el-form-item prop="category">
                 <template #label>
-                    <span><i class="required">*</i>类别</span>
+                    <span>类别</span>
                 </template>
                 <el-select :disabled="isSubmit" v-model="form.category" placeholder="选择类别">
                     <el-option v-for="item in categoryList" :key="item.id" :label="item.name" :value="item.id">
@@ -44,7 +44,7 @@
 
             <el-form-item prop="imgs">
                 <template #label>
-                    <span><i class="required">*</i>设置封面</span>
+                    <span>设置封面</span>
                     <el-button class="cut" @click="isCut = true"
                         :disabled="!form.videos[0]?.url || isSubmit">视频截帧</el-button>
                 </template>
@@ -81,7 +81,22 @@ export default {
                 videos: [],
                 imgs: [],
                 topics: [],
-                category: 1
+                category: ''
+            },
+            rules: {
+                desc: [
+                    { required: true, message: "请输入作品描述", trigger: "blur" },
+                    { min: 0, max: 300, message: "长度在 0 到 300 个字符", trigger: "blur" }
+                ],
+                category: [
+                    { required: true, message: "请选择类别", trigger: "change" }
+                ],
+                videos: [
+                    { required: true, message: "请上传视频", trigger: "blur" }
+                ],
+                imgs: [
+                    { required: true, message: "请上传封面", trigger: "blur" }
+                ]
             },
             topics: [],
             vSignal: new AbortController(),
@@ -104,15 +119,14 @@ export default {
                 videos: [],
                 imgs: [],
                 topics: [],
-                category: 1
+                category: ''
             }
         },
         getTopic() {
             VideoTopicList().then(res => {
                 if (res.status === 200) {
-                    const { topics } = res.data.data
-                    if (topics)
-                        this.topics = topics
+                    const topics = res.data.data
+                    this.topics = topics || []
                 }
             })
         },
@@ -226,31 +240,41 @@ export default {
             }
             if (this.isSubmit) return
             this.isSubmit = true
-            setTimeout(() => {
-                if (this.form.videos[0].url.includes("blob:") || this.form.imgs[0].url.includes("blob:")) {
+            this.$refs.form.validate((valid) => {
+                if (!valid) {
                     this.isSubmit = false
-                    this.submit()
                     return
                 }
-                const form = {
-                    categoryId: this.form.category,
-                    description: this.form.desc,
-                    topics: this.form.topics,
-                    coverUrl: this.form.imgs[0].url,
-                    playUrl: this.form.videos[0].url
-                }
-                VideoPublish(form).then(res => {
-                    if (res.status === 200) {
-                        this.$message.success(res.data.msg)
-                        this.$refs.form.resetFields()
-                        this.initForm()
-                    } else {
-                        this.$message.error(res.data.msg)
+                const fn = () => {
+                    if (this.form.videos[0].url.includes("blob:") || this.form.imgs[0].url.includes("blob:")) {
+                        this.fn()
+                        return
                     }
-                }).finally(() => {
-                    this.isSubmit = false
-                })
-            }, 1000 / 16)
+                    const form = {
+                        categoryId: this.form.category,
+                        description: this.form.desc,
+                        topics: this.form.topics,
+                        coverUrl: this.form.imgs[0].url,
+                        playUrl: this.form.videos[0].url
+                    }
+                    VideoPublish(form).then(res => {
+                        if (res.status === 200) {
+                            this.$message.success(res.data.msg)
+                            this.$refs.form.resetFields()
+                            this.initForm()
+                        } else {
+                            this.$message.error(res.data.msg)
+                        }
+                    }).finally(() => {
+                        this.isSubmit = false
+                    })
+                }
+
+                setTimeout(() => {
+                    fn()
+                }, 1000 / 16)
+
+            })
         }
     },
     mounted() {
@@ -283,20 +307,12 @@ export default {
                 color: @white;
                 display: flex;
                 float: unset;
-                justify-content: space-between;
                 align-items: flex-end;
-
-                .required {
-                    font-size: 12px;
-                    font-style: normal;
-                    margin-right: 5px;
-                    color: @red;
-                }
 
                 .count {
                     font-size: 12px;
                     font-style: normal;
-                    margin-left: 10px;
+                    margin-left: auto;
                 }
 
                 .cut {
@@ -306,6 +322,7 @@ export default {
                     height: 32px;
                     background-color: @red;
                     color: @white;
+                    margin-left: auto;
                     border: unset;
                 }
             }
