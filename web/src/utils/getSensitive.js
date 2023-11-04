@@ -7,9 +7,9 @@ const sensitiveWords = ["sb", "傻逼", "煞笔", "傻呗", "傻杯", "nc", "脑
  * @author: 涂国彬
  */
 export default function getSensitive(str) {
-    for (let i = 0; i < sensitiveList.length; i++) {
-        if (str.indexOf(sensitiveList[i]) !== -1) {
-            return sensitiveList[i]
+    for (let i = 0; i < sensitiveWords.length; i++) {
+        if (str.indexOf(sensitiveWords[i]) !== -1) {
+            return sensitiveWords[i]
         }
     }
     return null

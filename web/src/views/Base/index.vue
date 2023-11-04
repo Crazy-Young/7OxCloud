@@ -25,7 +25,7 @@
                 </div>
                 <el-avatar alt="logo" @click.native="navigateTo('/me')" v-if="userInfo.avatar" :src="userInfo.avatar">{{
                     userInfo.username }}</el-avatar>
-                <button type="button" v-else class="button" @click="toggleLogin">
+                <button type="button" v-else class="button" @click="handleLogin">
                     <UserIcon></UserIcon>
                     <p class="login">登录</p>
                 </button>
@@ -35,7 +35,7 @@
         <!-- 主体部分 -->
         <el-container>
             <!-- 左侧导航栏 -->
-            <el-aside width="160px">
+            <el-aside>
                 <!-- 配置路由 -->
                 <el-menu :default-active="$route.path" router>
                     <el-menu-item :index="item.path" v-for="item in routes" :key="item.name">
@@ -53,13 +53,11 @@
             </el-main>
         </el-container>
 
-        <Login v-if="isLogin" @close="toggleLogin"></Login>
     </el-container>
 </template>
 
 <script>
 import Logo from "@/icons/Logo";
-import Login from "@/components/Login";
 import { mapState } from "vuex";
 import VideoBox from "@/components/VideoBox";
 import SearchIcon from "@/icons/SearchIcon.vue";
@@ -78,7 +76,6 @@ export default {
     name: "Base",
     components: {
         Logo,
-        Login,
         VideoBox,
         SearchIcon,
         PublishIcon,
@@ -86,7 +83,6 @@ export default {
     },
     data() {
         return {
-            isLogin: false,
             search: '',
         }
     },
@@ -116,13 +112,13 @@ export default {
         })
     },
     methods: {
-        toggleLogin() {
-            this.isLogin = !this.isLogin
-        },
         navigateTo(path) {
             this.$router.push({
                 path
             })
+        },
+        handleLogin() {
+            this.$bus.$emit("toggleLogin")
         }
     },
 };
@@ -269,62 +265,66 @@ export default {
         }
     }
 
-    .el-aside {
 
-        .el-menu {
-            height: 100%;
-            background-color: transparent;
-            border-right: unset;
-            padding: 0 16px;
-            display: flex;
-            flex-direction: column;
-            --index: 0;
 
-            .el-menu-item {
-                width: 100%;
-                padding: 8px 16px !important;
-                border-radius: 12px;
+    .el-container {
+
+        .el-aside {
+            width: 160px !important;
+            overflow: auto;
+
+            .el-menu {
+                height: 100%;
+                background-color: transparent;
+                border-right: unset;
+                padding: 0 16px;
                 display: flex;
-                line-height: unset;
-                height: unset;
-                align-items: center;
-                color: @font;
-                gap: 12px;
+                flex-direction: column;
+                --index: 0;
 
-                &:not(:last-child) {
-                    margin-bottom: 3px;
-                }
+                .el-menu-item {
+                    width: 100%;
+                    padding: 8px 16px !important;
+                    border-radius: 12px;
+                    display: flex;
+                    line-height: unset;
+                    height: unset;
+                    align-items: center;
+                    color: @font;
+                    gap: 12px;
+
+                    &:not(:last-child) {
+                        margin-bottom: 3px;
+                    }
 
 
-                &:focus,
-                &:active {
-                    background-color: unset;
-                }
+                    &:focus,
+                    &:active {
+                        background-color: unset;
+                    }
 
-                &.is-active,
-                &:hover {
-                    background-color: @transparent-dark;
-                    color: @white;
+                    &.is-active,
+                    &:hover {
+                        background-color: @transparent-dark;
+                        color: @white;
+
+                        .icon {
+                            opacity: 1;
+                        }
+                    }
 
                     .icon {
-                        opacity: 1;
+                        width: 24px;
+                        height: 24px;
+                        background: url('../../assets/nav.png') no-repeat;
+                        background-size: auto 24px;
+                        background-position-x: calc(var(--index) * -24px);
+                        opacity: .5;
+                        background-position-y: 0;
                     }
-                }
-
-                .icon {
-                    width: 24px;
-                    height: 24px;
-                    background: url('../../assets/nav.png') no-repeat;
-                    background-size: auto 24px;
-                    background-position-x: calc(var(--index) * -24px);
-                    opacity: .5;
-                    background-position-y: 0;
                 }
             }
         }
-    }
-
-    .el-container {
 
         .el-main {
             height: calc(100vh - 68px);
