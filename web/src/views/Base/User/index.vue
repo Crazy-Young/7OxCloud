@@ -96,7 +96,7 @@ export default {
             this.userInfo.fanCount += this.userInfo.isFollow ? 1 : - 1
         },
         getVideoList() {
-            return this.reqVideoList(() => VideoPublishList(this.uid))
+            return this.reqVideoList(() => VideoPublishList(this.uid, this.latestTime))
         }
     },
     computed: {

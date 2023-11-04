@@ -5,7 +5,7 @@
                 <VideoBox class="video" v-for="(item, index) in videoList" v-bind="item" :key="item.vid" ref="VideoBox"></VideoBox>
             </template>
         </div>
-        <DataStatus :isDataEnd="isDataEnd" :length="videoList.length" ref="loading" @getVideoList="getVideoList"></DataStatus>
+        <DataStatus :loading="loading" :isDataEnd="isDataEnd" :length="videoList.length" ref="loading" @getVideoList="getVideoList"></DataStatus>
     </div>
 </template>
 
@@ -24,7 +24,7 @@ export default {
     },
     data() {
         return {
-            loading: true,
+            loading: false,
         }
     },
     methods: {
@@ -34,6 +34,7 @@ export default {
         },
         // 加载所有资源
         async loadAllSources() {
+            if(this.loading) return
             this.loading = true
             for (let i = 0; i < this.videoList.length; i++) {
                 if(this.videoList[i].isLoaded) continue

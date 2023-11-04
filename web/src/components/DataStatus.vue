@@ -1,7 +1,7 @@
 <template>
     <div class="data-status">
         <!-- 加载中：数据没有加载完毕 -->
-        <Loading v-if="!isDataEnd" ref="loading"></Loading>
+        <Loading v-if="!isDataEnd || loading" ref="loading"></Loading>
         <!-- 加载完毕：数据长度为0 -->
         <div class="no-data" v-else-if="!length">
             <el-empty description="暂无相关视频"></el-empty>
@@ -33,6 +33,10 @@ export default {
         isDataEnd: {
             type: Boolean,
             default: false
+        },
+        loading: {
+            type: Boolean,
+            default: false
         }
     },
     mounted() {
@@ -44,7 +48,7 @@ export default {
             }
         }, {
             // 观察的距交叉的距离
-            threshold: 0,
+            threshold: 0.5,
         })
 
         // 监听Loading组件是否出现在视口(包含第一次加载的情况)
@@ -63,10 +67,7 @@ export default {
     position: relative;
 
     .loading {
-        position: absolute;
-        bottom: 0;
-        transform: translateY(100%);
-        padding: 35vh 0;
+        margin: 20vh 0;
     }
 
     .no-data {
@@ -74,7 +75,7 @@ export default {
     }
 
     .no-more {
-        margin: 10vh auto;
+        margin: 20vh auto;
         text-align: center;
         color: @gray-3;
     }

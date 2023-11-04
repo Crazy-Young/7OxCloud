@@ -128,7 +128,7 @@ export default {
                 if (res.status === 200) {
                     this.$message.success(res?.data?.msg);
                     this.$emit('deleteVideo', this.vid);
-                }else {
+                } else {
                     this.$message.error(res?.data?.msg);
                 }
             })
@@ -146,9 +146,37 @@ export default {
     border-radius: 10px;
     overflow: hidden;
     height: fit-content;
+    animation: fade-in .3s forwards;
+
+    @keyframes fade-in {
+        from {
+            opacity: 0.3;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
 
     .video-content {
         position: relative;
+
+        &:hover {
+            .video-content-xg {
+
+                .video-like-count {
+                    opacity: 0;
+                }
+
+                .video-delete {
+                    opacity: 1;
+                }
+
+                /deep/ .xgplayer-controls {
+                    opacity: 1;
+                }
+            }
+        }
 
         .video-content-xg {
             position: absolute;
@@ -156,16 +184,18 @@ export default {
             top: 0;
             width: 100%;
             height: 100%;
+            filter: drop-shadow(0 0 1px @gray-2);
 
             .video-like-count {
                 position: absolute;
-                top: 12px;
+                bottom: 12px;
                 left: 12px;
                 color: @white;
                 display: flex;
                 align-items: center;
                 gap: 5px;
                 font-size: 16px;
+                transition: all .3s;
                 filter: drop-shadow(0 0 1px @gray-2);
             }
 
@@ -173,9 +203,20 @@ export default {
                 position: absolute;
                 top: 12px;
                 right: 12px;
+                opacity: 0;
                 color: @white;
+                transition: all .3s;
                 font-size: 16px;
                 filter: drop-shadow(0 0 1px @gray-2);
+            }
+
+            /deep/ .xgplayer-start {
+                display: none;
+            }
+
+            /deep/ .xgplayer-controls {
+                opacity: 0;
+                transition: all .3s;
             }
         }
     }

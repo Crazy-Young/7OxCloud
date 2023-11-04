@@ -61,7 +61,8 @@
             <el-empty description="点击右上角按钮进行登录" v-if="!userInfo.uid" :image-size="180">
             </el-empty>
             <!-- 数据状态 -->
-            <DataStatus v-else :isDataEnd="isDataEnd" :length="videoList.length" ref="loading" @getVideoList="getVideoList"></DataStatus>
+            <DataStatus v-else :isDataEnd="isDataEnd" :length="videoList.length" ref="loading" @getVideoList="getVideoList">
+            </DataStatus>
         </main>
 
         <!-- 修改用户信息 -->
@@ -126,13 +127,13 @@ export default {
             this.reqVideoList(() => {
                 switch (this.activeChoice) {
                     case 'work':
-                        return VideoPublishList()
+                        return VideoPublishList(this.userInfo.uid, this.latestTime)
                     case 'like':
-                        return LikeVideoList()
+                        return LikeVideoList(this.userInfo.uid, this.latestTime)
                     case 'collect':
-                        return CollectVideoList()
+                        return CollectVideoList(this.userInfo.uid, this.latestTime)
                     case 'history':
-                        return VideoPublishList()
+                        return VideoPublishList(this.userInfo.uid, this.latestTime)
                 }
             })
         },
