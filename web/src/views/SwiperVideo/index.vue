@@ -61,7 +61,6 @@ import videoList from "@/mixins/videoList";
 import UserOperation from "@/components/UserOperation.vue";
 import CommentWindow from "@/components/CommentWindow.vue";
 import PlayerWithMethod from '@/components/PlayerWithMethod.vue';
-import { ViewVideo } from "@/api/video";
 import Loading from "@/components/Loading.vue";
 export default {
     name: "SwiperVideo",
@@ -127,7 +126,6 @@ export default {
             })
             this.activeIndex = this.$refs.swiper?.swiper?.activeIndex || 0
             this.$refs.XgPlayer[this.activeIndex]?.play()
-            ViewVideo(this.videoList[this.activeIndex].vid)
         },
         handleTouchStart(event) {
             this.$refs.swiper?.swiper.onTouchStart(event)

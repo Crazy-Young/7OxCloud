@@ -9,6 +9,7 @@
 
 <script>
 import Xgplayer from "xgplayer";
+import { ViewVideo } from "@/api/video";
 export default {
     name: "XgPlayer",
     props: {
@@ -91,7 +92,7 @@ export default {
                     mode: this.ctrlpos,
                     autoHide: this.autoHide
                 },
-                closeVideoDblclick: true
+                closeVideoDblclick: true,
             });
         },
         destroyPlayer() {
@@ -109,6 +110,9 @@ export default {
     },
     mounted() {
         this.initPlayer();
+        this.player.on('play', () => {
+            ViewVideo(this.vid)
+        })
     },
     beforeDestroy() {
         this.destroyPlayer();
