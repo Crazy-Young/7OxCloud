@@ -1,0 +1,12 @@
+{
+  "redis": {
+      "host": "172.28.242.13",
+      "port": 6379,
+      "database": 1,
+      "expiration": 30
+  },
+  "recommend": {
+    "host": "127.0.0.1",
+    "port": 8976
+  }
+}

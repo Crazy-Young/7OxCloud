@@ -1,7 +1,7 @@
 {
   "service": {
     "name": "VideoService",
-    "host": "113.54.245.226",
+    "host": "10.252.79.1",
     "tags": ["7OxCloud", "Video", "Service"]
   },
   "mysql": {
@@ -14,5 +14,13 @@
   "consul": {
     "host": "172.28.242.13",
     "port": 8500
+  },
+  "recommend": {
+    "host": "127.0.0.1",
+    "port": 8976
+  },
+  "redis": {
+    "host": "172.28.242.13",
+    "port": 6379
   }
 }

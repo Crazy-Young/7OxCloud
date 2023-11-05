@@ -44,14 +44,63 @@ func Feed(c *gin.Context) {
 	})
 }
 
-func HotFeed(c *gin.Context) {
+func RecommendedFeed(c *gin.Context) {
+	currentUserId := c.GetInt("userId")
+	res, err := global.VideoServiceClient.RecommendedFeed(c, &videoProto.FeedRequest{
+		CurrentUserId: int64(currentUserId),
+	})
+	if err != nil {
+		HandleGrpcErrorToHttp(c, err)
+		return
+	}
+	videos := make([]gin.H, len(res.Videos))
+	for i, video := range res.Videos {
+		videos[i] = VideoToResponse(video)
+	}
+	var refreshedToken interface{}
+	if currentUserId != 0 {
+		token := c.GetString("token")
+		j := middleware.NewJWT()
+		refreshedToken, _ = j.RefreshToken(token)
+	}
+	HandleHttpResponse(c, http.StatusOK, "获取推荐视频流成功", refreshedToken, gin.H{
+		"videos": videos,
+	})
+}
+
+func HistoryFeed(c *gin.Context) {
 	latestTime := util.String2Int64(c.Query("latestTime"))
 	if latestTime == 0 {
 		latestTime = time.Now().Unix()
 	}
 	currentUserId := c.GetInt("userId")
-	res, err := global.VideoServiceClient.HotFeed(c, &videoProto.FeedRequest{
+	res, err := global.VideoServiceClient.HistoryFeed(c, &videoProto.FeedRequest{
 		LatestTime:    latestTime,
+		CurrentUserId: int64(currentUserId),
+	})
+	if err != nil {
+		HandleGrpcErrorToHttp(c, err)
+		return
+	}
+	videos := make([]gin.H, len(res.Videos))
+	for i, video := range res.Videos {
+		videos[i] = SmallVideoToResponse(video)
+	}
+	var refreshedToken interface{}
+	if currentUserId != 0 {
+		token := c.GetString("token")
+		j := middleware.NewJWT()
+		refreshedToken, _ = j.RefreshToken(token)
+	}
+	HandleHttpResponse(c, http.StatusOK, "获取历史视频流成功", refreshedToken, gin.H{
+		"videos":   videos,
+		"nextTime": res.NextTime,
+	})
+}
+
+func HotFeed(c *gin.Context) {
+	currentUserId := c.GetInt("userId")
+	res, err := global.VideoServiceClient.HotFeed(c, &videoProto.HotFeedRequest{
 		CurrentUserId: int64(currentUserId),
 	})
 	if err != nil {
@@ -69,8 +118,7 @@ func HotFeed(c *gin.Context) {
 		refreshedToken, _ = j.RefreshToken(token)
 	}
 	HandleHttpResponse(c, http.StatusOK, "获取热门视频流成功", refreshedToken, gin.H{
-		"videos":   videos,
-		"nextTime": res.NextTime,
+		"videos": videos,
 	})
 }
 
@@ -132,9 +180,9 @@ func PublishList(c *gin.Context) {
 	if uid == 0 {
 		uid = int64(currentUserId)
 	}
-	res, err := global.VideoServiceClient.PublishList(c, &videoProto.PublishListRequest{
-		UserId:     uid,
-		LatestTime: latestTime,
+	res, err := global.VideoServiceClient.PublishList(c, &videoProto.FeedRequest{
+		CurrentUserId: uid,
+		LatestTime:    latestTime,
 	})
 	if err != nil {
 		HandleGrpcErrorToHttp(c, err)

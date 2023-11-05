@@ -1,10 +1,14 @@
 package dao
 
 import (
+	"context"
+	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/palp1tate/7OxCloud/7OxCloud-srv/video/global"
 	"github.com/palp1tate/7OxCloud/model"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
@@ -16,14 +20,34 @@ func GetVideos(latestTime time.Time) (videoList []*model.Video, err error) {
 	return
 }
 
-func GetHotVideos(latestTime time.Time) (videoList []*model.Video, err error) {
+func GetHistoryVideos(latestTime time.Time, UserId int64) (videoList []*model.Video, err error) {
+	members, err := global.RedisClient.ZRange(context.Background(),
+		fmt.Sprintf("history:%d", UserId), 0, -1).Result()
+	if err != nil {
+		zap.S().Warnf("failed to get history from redis: %s", err.Error())
+	}
+	var watchedVideos []int64
+	for _, member := range members {
+		i, _ := strconv.ParseInt(member, 10, 64)
+		watchedVideos = append(watchedVideos, i)
+	}
+	if len(watchedVideos) == 0 {
+		return
+	}
+	err = global.DB.Where("id in ?", watchedVideos).
+		Where("created_at < ?", latestTime).
+		Order("id desc").
+		Limit(15).
+		Find(&videoList).Error
+	return
+}
+
+func GetHotVideos() (videoList []*model.Video, err error) {
 	err = global.DB.Model(&model.Video{}).
 		Joins("left join `like` on video.id = `like`.video_id").
-		Where("video.created_at < ?", latestTime).
 		Group("video.id").
 		Order("count(`like`.id) desc").
 		Order("video.id desc").
-		Limit(15).
 		Find(&videoList).Error
 	return
 }
@@ -101,6 +125,30 @@ func GetVideosByUserId(latestTime time.Time, uid int64) (videoList []*model.Vide
 func GetVideo(vid int64) (video *model.Video, err error) {
 	video = &model.Video{}
 	err = global.DB.Where("id = ?", vid).First(&video).Error
+	return
+}
+
+func GetRecommendedVideos(videoIds []int64, userId int64) (videoList []*model.Video, err error) {
+	if len(videoIds) != 0 {
+		err = global.DB.Where("id in ?", videoIds).Find(&videoList).Error
+		return
+	}
+	members, err := global.RedisClient.ZRange(context.Background(),
+		fmt.Sprintf("history:%d", userId), 0, -1).Result()
+	if err != nil {
+		zap.S().Warnf("failed to get history from redis: %s", err.Error())
+	}
+	var watchedVideos []int64
+	for _, member := range members {
+		i, _ := strconv.ParseInt(member, 10, 64)
+		watchedVideos = append(watchedVideos, i)
+	}
+	if len(watchedVideos) == 0 {
+		err = global.DB.Order("id desc").Find(&videoList).Error
+		return
+	}
+	err = global.DB.Where("id not in ?", watchedVideos).Order("id desc").Limit(15).
+		Find(&videoList).Error
 	return
 }
 

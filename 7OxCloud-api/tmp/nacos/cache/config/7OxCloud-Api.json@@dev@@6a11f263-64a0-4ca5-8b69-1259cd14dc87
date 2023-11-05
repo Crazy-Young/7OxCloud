@@ -1,7 +1,7 @@
 {
     "api": {
         "name": "7OxCloud-Api",
-        "host": "113.54.245.226",
+        "host": "10.252.79.1",
         "tags": ["7OxCloud","Api"]
     },
     "service": {
@@ -23,6 +23,7 @@
     "redis": {
         "host": "172.28.242.13",
         "port": 6379,
+        "database": 0,
         "expiration": 120
     },
     "consul": {

@@ -10,6 +10,8 @@ service SocialService {
   rpc GetFan(GetFanRequest) returns (GetFanResponse) {}
   rpc FollowFeed(FollowFeedRequest) returns (FeedResponse) {}
   rpc FriendFeed(FriendFeedRequest) returns (FeedResponse) {}
+  rpc SearchFollowing(SearchRequest) returns (SearchFollowingResponse) {}
+  rpc SearchFan(SearchRequest) returns (SearchFanResponse) {}
 }
 
 message FollowRequest {
@@ -27,36 +29,40 @@ message User {
   string username = 2;
   string avatar = 3;
   string location = 4;
-  bool isFollow = 5;
 }
 
-message MiniUser{
+message Following{
   int64 id = 1;
   string username = 2;
   string avatar = 3;
   string signature = 4;
+  bool isFan = 5;
+}
+
+message Fan{
+  int64 id = 1;
+  string username = 2;
+  string avatar = 3;
+  string signature = 4;
+  bool isFollow = 5;
 }
 
 message GetFollowingRequest{
-  int64 userId = 1;
-  int64 latestTime = 2;
+  int64 currentUserId = 1;
 }
 
 message GetFollowingResponse{
-  repeated MiniUser followings = 1;
+  repeated Following followings = 1;
   int64 Count = 2;
-  int64 nextTime = 3;
 }
 
 message GetFanRequest{
-  int64 userId = 1;
-  int64 latestTime = 2;
+  int64 currentUserId = 1;
 }
 
 message GetFanResponse{
-  repeated MiniUser fans = 1;
+  repeated Fan fans = 1;
   int64 Count = 2;
-  int64 nextTime = 3;
 }
 
 message FollowFeedRequest{
@@ -92,4 +98,17 @@ message Video{
 message Topic{
   int64 id = 1;
   string description = 2;
+}
+
+message SearchRequest{
+  string keyword = 1;
+  int64 currentUserId = 2;
+}
+
+message SearchFollowingResponse{
+  repeated Following followings = 1;
+}
+
+message SearchFanResponse{
+  repeated Fan fans = 1;
 }

@@ -5,21 +5,27 @@ option go_package = ".;videoProto";
 
 service VideoService {
   rpc Feed (FeedRequest) returns (MiniFeedResponse) {}
+  rpc RecommendedFeed(FeedRequest) returns (FeedResponse) {}
+  rpc HistoryFeed (FeedRequest) returns (HistoryFeedResponse) {}
   rpc Publish (PublishRequest) returns (google.protobuf.Empty) {}
   rpc Video (VideoRequest) returns (VideoResponse) {}
-  rpc PublishList (PublishListRequest) returns (PublishListResponse) {}
+  rpc PublishList (FeedRequest) returns (PublishListResponse) {}
   rpc FeedByTopic (FeedByTopicRequest) returns (FeedResponse) {}
   rpc CategoryList (google.protobuf.Empty) returns (CategoryListResponse) {}
   rpc TopicList (google.protobuf.Empty) returns (TopicListResponse) {}
   rpc FeedByCategory (FeedByCategoryRequest) returns (MiniFeedResponse) {}
   rpc FeedBySearch (FeedBySearchRequest) returns (FeedResponse) {}
-  rpc HotFeed (FeedRequest) returns (MiniFeedResponse) {}
+  rpc HotFeed (HotFeedRequest) returns (MiniFeedResponse) {}
   rpc DeleteVideo (VideoRequest) returns (google.protobuf.Empty) {}
 }
 
 message FeedRequest {
   int64 latestTime = 1;
   int64 currentUserId = 2;
+}
+
+message HotFeedRequest {
+  int64 currentUserId = 1;
 }
 
 message FeedResponse {
@@ -45,9 +51,9 @@ message VideoResponse {
   Video video = 1;
 }
 
-message PublishListRequest {
-  int64 userId = 1;
-  int64 latestTime = 2;
+message HistoryFeedResponse {
+  repeated SmallVideo videos = 1;
+  int64 nextTime = 2;
 }
 
 message PublishListResponse {

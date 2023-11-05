@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"net"
@@ -9,6 +10,7 @@ import (
 	"syscall"
 
 	"github.com/palp1tate/7OxCloud/7OxCloud-srv/interaction/global"
+	"github.com/palp1tate/7OxCloud/7OxCloud-srv/interaction/handler"
 	"github.com/palp1tate/7OxCloud/7OxCloud-srv/interaction/initialize"
 	"github.com/palp1tate/7OxCloud/util"
 	"go.uber.org/zap"
@@ -18,6 +20,12 @@ func main() {
 	initialize.InitConfig()
 	initialize.InitLogger()
 	initialize.InitMySQL()
+	initialize.InitRedis()
+	initialize.InitRabbitMQ()
+	initialize.InitCSV()
+	loadingScript()
+
+	defer global.RedisClient.Close()
 
 	host := global.ServerConfig.Service.Host
 	port := flag.Int("p", 0, "端口号")
@@ -60,4 +68,11 @@ func main() {
 	} else {
 		zap.S().Infof("%s注销成功", serviceName)
 	}
+}
+
+func loadingScript() {
+	ctx := context.Background()
+	go handler.SyncViewVideo(ctx)
+	go handler.SyncLikeVideo(ctx)
+	go handler.SyncCollectVideo(ctx)
 }

@@ -5,15 +5,34 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/palp1tate/7OxCloud/util"
-
 	"github.com/gin-gonic/gin"
 	"github.com/palp1tate/7OxCloud/7OxCloud-api/consts"
 	"github.com/palp1tate/7OxCloud/7OxCloud-api/form"
 	"github.com/palp1tate/7OxCloud/7OxCloud-api/global"
 	"github.com/palp1tate/7OxCloud/7OxCloud-api/middleware"
 	"github.com/palp1tate/7OxCloud/proto/interaction"
+	"github.com/palp1tate/7OxCloud/util"
 )
+
+func ViewVideo(c *gin.Context) {
+	vid := util.String2Int64(c.Query("vid"))
+	if vid == 0 {
+		HandleHttpResponse(c, http.StatusBadRequest, "vid不能为空", nil, nil)
+		return
+	}
+	_, err := global.InteractionServiceClient.ViewVideo(c, &interactionProto.ViewVideoRequest{
+		UserId:  int64(c.GetInt("userId")),
+		VideoId: vid,
+	})
+	if err != nil {
+		HandleGrpcErrorToHttp(c, err)
+		return
+	}
+	token := c.GetString("token")
+	j := middleware.NewJWT()
+	refreshedToken, _ := j.RefreshToken(token)
+	HandleHttpResponse(c, http.StatusOK, "观看视频成功", refreshedToken, nil)
+}
 
 func LikeVideo(c *gin.Context) {
 	likeVideoForm := form.LikeVideoForm{}

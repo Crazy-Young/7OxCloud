@@ -15,6 +15,7 @@ var visitWithoutLogin = gin.H{
 	"/api/user/get_user": true,
 
 	"/api/video/feed":             true,
+	"/api/video/recommended_feed": true,
 	"/api/video/hot_feed":         true,
 	"/api/video/get_video":        true,
 	"/api/video/publish_list":     true,

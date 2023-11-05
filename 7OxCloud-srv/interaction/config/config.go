@@ -13,15 +13,37 @@ type MySQLConfig struct {
 	Password string `json:"password"`
 }
 
+type RedisConfig struct {
+	Host       string `json:"host"`
+	Port       int    `json:"port"`
+	Database   int    `json:"database"`
+	Expiration int    `json:"expiration"`
+}
+
 type ConsulConfig struct {
 	Host string `json:"host"`
 	Port int    `json:"port"`
 }
 
+type RabbitMQConfig struct {
+	Host     string `json:"host"`
+	Port     int    `json:"port"`
+	User     string `json:"user"`
+	Password string `json:"password"`
+}
+
+type RecommendConfig struct {
+	Host string `json:"host"`
+	Port int    `json:"port"`
+}
+
 type ServerConfig struct {
-	Service ServiceConfig `json:"service"`
-	MySQL   MySQLConfig   `json:"mysql"`
-	Consul  ConsulConfig  `json:"consul"`
+	Service   ServiceConfig   `json:"service"`
+	MySQL     MySQLConfig     `json:"mysql"`
+	Redis     RedisConfig     `json:"redis"`
+	Consul    ConsulConfig    `json:"consul"`
+	RabbitMQ  RabbitMQConfig  `json:"rabbitmq"`
+	Recommend RecommendConfig `json:"recommend"`
 }
 
 type NacosConfig struct {

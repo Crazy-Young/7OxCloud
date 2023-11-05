@@ -32,6 +32,7 @@ type ConsulConfig struct {
 type RedisConfig struct {
 	Host       string `json:"host"`
 	Port       int    `json:"port"`
+	Database   int    `json:"database"`
 	Expiration int    `json:"expiration"`
 }
 

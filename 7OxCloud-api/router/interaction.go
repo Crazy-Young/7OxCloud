@@ -9,6 +9,7 @@ import (
 func InitInteractionRouter(Router *gin.RouterGroup) {
 	InteractionRouter := Router.Group("/interaction", middleware.JWTAuth())
 	{
+		InteractionRouter.GET("/view_video", api.ViewVideo)
 		InteractionRouter.POST("/like_video", api.LikeVideo)
 		InteractionRouter.POST("/collect_video", api.CollectVideo)
 		InteractionRouter.GET("/like_list", api.GetLikeList)

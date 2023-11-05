@@ -23,53 +23,57 @@ func CancelFollow(userId int64, fanId int64) (err error) {
 	return
 }
 
-func GetFollowing(latestTime time.Time, userId int64) (followingList []model.User, count int64, err error) {
-	tx := global.DB.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
-	err = tx.Model(&model.Follow{}).Where("fan_id = ?", userId).Count(&count).Error
-	if err != nil {
-		tx.Rollback()
-		return
-	}
-	err = tx.Joins("left join follow on follow.user_id = user.id").
-		Where("follow.fan_id = ? AND follow.created_at < ?", userId, latestTime).
+func GetFollowing(userId int64) (followingList []model.User, count int64, err error) {
+	err = global.DB.Model(&model.User{}).Joins("left join follow on follow.user_id = user.id").
+		Where("follow.fan_id = ?", userId).
+		Count(&count).
 		Order("follow.id desc").
-		Limit(15).
 		Find(&followingList).Error
-	if err != nil {
-		tx.Rollback()
-		return
-	}
-	tx.Commit()
 	return
 }
 
-func GetFan(latestTime time.Time, userId int64) (fanList []model.User, count int64, err error) {
-	tx := global.DB.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
-	err = tx.Model(&model.Follow{}).Where("user_id = ?", userId).Count(&count).Error
-	if err != nil {
-		tx.Rollback()
-		return
-	}
-	err = tx.Joins("left join follow on follow.fan_id = user.id").
-		Where("follow.user_id = ? AND follow.created_at < ?", userId, latestTime).
+func SearchFollowing(userId int64, keyword string) (followingList []model.User, err error) {
+	err = global.DB.Model(&model.User{}).Joins("left join follow on follow.user_id = user.id").
+		Where("follow.fan_id = ? AND user.username like ?", userId, "%"+keyword+"%").
 		Order("follow.id desc").
-		Limit(15).
+		Find(&followingList).Error
+	return
+}
+
+func GetFan(userId int64) (fanList []model.User, count int64, err error) {
+	err = global.DB.Model(&model.User{}).Joins("left join follow on follow.fan_id = user.id").
+		Where("follow.user_id = ?", userId).
+		Count(&count).
+		Order("follow.id desc").
 		Find(&fanList).Error
+	return
+}
+
+func SearchFan(userId int64, keyword string) (fanList []model.User, err error) {
+	err = global.DB.Model(&model.User{}).Joins("left join follow on follow.fan_id = user.id").
+		Where("follow.user_id = ? AND user.username like ?", userId, "%"+keyword+"%").
+		Order("follow.id desc").
+		Find(&fanList).Error
+	return
+}
+
+func GetIsFan(userId int64, currentUserId int64) (isFan bool, err error) {
+	var follow model.Follow
+	isFan = true
+	err = global.DB.Where("user_id = ? and fan_id = ?", currentUserId, userId).First(&follow).Error
 	if err != nil {
-		tx.Rollback()
-		return
+		isFan = false
 	}
-	tx.Commit()
+	return
+}
+
+func GetIsFollow(userId int64, currentUserId int64) (isFollow bool, err error) {
+	var follow model.Follow
+	isFollow = true
+	err = global.DB.Where("user_id = ? and fan_id = ?", userId, currentUserId).First(&follow).Error
+	if err != nil {
+		isFollow = false
+	}
 	return
 }
 
