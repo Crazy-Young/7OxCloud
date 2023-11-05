@@ -23,9 +23,11 @@ const mutations = {
         state.userInfo = {}
     },
     SET_USER_FOLLOW(state, followList) {
+        followList.forEach(item => item.isFollow = true)
         state.followList = followList
     },
     SET_USER_FAN(state, fanList) {
+        fanList.forEach(item => item.isFan = true)
         state.fanList = fanList
     }
 }
@@ -126,7 +128,8 @@ const actions = {
         return new Promise((resolve, reject) => {
             UserFollowList().then(res => {
                 if (res.status === 200) {
-                    commit('SET_USER_FOLLOW', res.data.data.followings || [])
+                    const followings = res.data.data.followings || []
+                    commit('SET_USER_FOLLOW', followings)
                     resolve(res)
                 } else {
                     Vue.prototype.$message.error(res.data.msg)
@@ -142,7 +145,8 @@ const actions = {
         return new Promise((resolve, reject) => {
             UserFanList().then(res => {
                 if (res.status === 200) {
-                    commit('SET_USER_FAN', res.data.data.fans || [])
+                    const fans = res.data.data.fans || []
+                    commit('SET_USER_FAN', fans)
                     resolve(res)
                 } else {
                     Vue.prototype.$message.error(res.data.msg)

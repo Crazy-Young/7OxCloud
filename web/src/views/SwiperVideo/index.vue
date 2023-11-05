@@ -147,7 +147,7 @@ export default {
     },
     watch: {
         activeIndex(newVal) {
-            if (newVal === this.videoList.length - 1) {
+            if (newVal >= this.videoList.length - 2) {
                 this.getVideoList()
             }
         }

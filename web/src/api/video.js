@@ -112,7 +112,7 @@ export const VideoListByFollow = (last) => request.get('/social/follow_feed' + (
  * @returns {Promise}
  * @memberof Video
  */
-export const VideoListByRecommend = (last) => request.get('/social/feed_by_recommend' + (last ? `?latestTime=${last}` : ''))
+export const VideoListByRecommend = (last) => request.get('/video/recommended_feed' + (last ? `?latestTime=${last}` : ''))
 
 /**
  * 根据好友获取视频
@@ -131,8 +131,13 @@ let UserVideoCancelToken = axios.CancelToken.source()
  */
 export const cancelUserVideo = () => {
     // 取消原来的请求
-    UserVideoCancelToken.cancel()
-    // 创建新的请求，否则无法再次发起
+    UserVideoCancelToken.cancel('cancel')
+    // 创建新的取消令牌
+    generateUserVideoCancelToken()
+}
+
+const generateUserVideoCancelToken = () => {
+    // 创建新的取消令牌
     UserVideoCancelToken = axios.CancelToken.source()
 }
 
@@ -166,6 +171,16 @@ export const LikeVideoList = (uid, last) => request.get('/interaction/like_list'
  * @memberof Video
  */
 export const CollectVideoList = (uid, last) => request.get('/interaction/collect_list' + (uid ? `?uid=${uid}&latestTime=${last}` : ''), {
+    cancelToken: UserVideoCancelToken.token
+})
+
+/**
+ * 观看历史视频列表
+ * @returns {Promise}
+ * @param {Number} last 最新时间
+ * @memberof Video
+ */
+export const HistoryVideoList = (last) => request.get('/video/history_feed' + (last ? `?latestTime=${last}` : ''), {
     cancelToken: UserVideoCancelToken.token
 })
 

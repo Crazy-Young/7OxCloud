@@ -61,7 +61,7 @@
             <el-empty description="点击右上角按钮进行登录" v-if="!userInfo.uid" :image-size="180">
             </el-empty>
             <!-- 数据状态 -->
-            <DataStatus v-else :isDataEnd="isDataEnd" :length="videoList.length" ref="loading" @getVideoList="getVideoList">
+            <DataStatus v-else :isDataEnd="isDataEnd" :length="videoList.length" ref="loading" @getVideoList="getData">
             </DataStatus>
         </main>
 
@@ -75,12 +75,13 @@
 <script>
 import { mapState } from 'vuex'
 import ChangeInfo from './ChangeInfo'
-import { VideoPublishList, LikeVideoList, CollectVideoList, cancelUserVideo } from '@/api/video'
+import { VideoPublishList, LikeVideoList, CollectVideoList, HistoryVideoList } from '@/api/video'
 import VideoBox from '@/components/VideoBox.vue'
 import videoList from '@/mixins/videoList'
 import FollowList from "./FollowList"
 import GenderIcon from '@/icons/GenderIcon.vue'
 import DataStatus from '@/components/DataStatus.vue'
+import debounce from '@/utils/debounce'
 export default {
     name: 'Me',
     mixins: [videoList],
@@ -98,7 +99,7 @@ export default {
     },
     data() {
         return {
-            activeChoice: '',
+            activeChoice: 'work',
             isChange: false,
             isShowFollowList: false,
         }
@@ -107,22 +108,21 @@ export default {
         init() {
             // 初始化数据
             this.isDataEnd = false
+            this.loading = false
             this.videoList = []
             this.latestTime = null
         },
-        async getData() {
+        getData() {
             // 初始化数据
             this.init()
             // 获取视频列表
-            await this.getVideoList()
+            this.getVideoList()
         },
         logout() {
             // 退出登录，清空用户信息
             this.$store.dispatch('UserLogout')
         },
-        getVideoList() {
-            // 取消所有请求，避免请求混乱
-            cancelUserVideo()
+        getVideoList: debounce(function () {
             // 切换选项，根据选项请求不同数据
             this.reqVideoList(() => {
                 switch (this.activeChoice) {
@@ -133,10 +133,10 @@ export default {
                     case 'collect':
                         return CollectVideoList(this.userInfo.uid, this.latestTime)
                     case 'history':
-                        return VideoPublishList(this.userInfo.uid, this.latestTime)
+                        return HistoryVideoList(this.latestTime)
                 }
             })
-        },
+        },100),
         deleteVideo(vid) {
             // 删除视频
             this.videoList = this.videoList.filter(item => item.vid !== vid)
@@ -155,17 +155,6 @@ export default {
         activeChoice(newVal, oldVal) {
             if (newVal === oldVal) return
             this.getData();
-        },
-        // 如果用户登录，切换tab
-        'userInfo.uid': {
-            immediate: true,
-            handler(newVal, oldVal) {
-                if (newVal) {
-                    this.activeChoice = 'work'
-                } else {
-                    this.activeChoice = ''
-                }
-            }
         },
         isShowFollowList() {
             // 关闭用户关注/粉丝列表时，重新获取用户信息，保证用户信息是最新的

@@ -15,7 +15,7 @@ export default {
     },
     methods: {
         getVideoList() {
-            this.reqVideoList(() => VideoListByHot(this.latestTime))
+            this.reqVideoList(() => VideoListByHot())
         }
     },
 }

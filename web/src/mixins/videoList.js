@@ -3,15 +3,17 @@ export default {
         return {
             videoList: [],
             latestTime: null,
-            isDataEnd: false
+            isDataEnd: false,
+            isRequestData: false
         }
     },
     methods: {
         async reqVideoList(getVideoFunction) {
             try {
-                if(this.isDataEnd) {
+                if(this.isRequestData || this.isDataEnd) {
                     return
                 }
+                this.isRequestData = true
                 const res = await getVideoFunction()
                 if(!res) {
                     return
@@ -24,12 +26,14 @@ export default {
                 this.videoList.push(...(res.data.data.videos || []))
                 this.latestTime = res.data.data.nextTime
 
-                if (res.data.data.videos.length < 15) {
+                if (res.data.data.videos.length < 15 || !res.data.data.nextTime) {
                     this.isDataEnd = true
                 }
+                this.isRequestData = false
             } catch (error) {
                 this.$message.error(error)
                 this.isDataEnd = true
+                this.isRequestData = false
             }
         }
     }
