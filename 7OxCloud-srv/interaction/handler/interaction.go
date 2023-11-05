@@ -2,11 +2,22 @@ package handler
 
 import (
 	"context"
+	"encoding/csv"
+	"encoding/json"
+	"fmt"
+	"os"
+	"strconv"
 	"time"
 
+	"go.uber.org/zap"
+
+	"github.com/go-redis/redis/v8"
+
 	"github.com/golang/protobuf/ptypes/empty"
+	"github.com/palp1tate/7OxCloud/7OxCloud-srv/interaction/consts"
 	"github.com/palp1tate/7OxCloud/7OxCloud-srv/interaction/dao"
 	"github.com/palp1tate/7OxCloud/7OxCloud-srv/interaction/global"
+	"github.com/palp1tate/7OxCloud/7OxCloud-srv/interaction/mq"
 	"github.com/palp1tate/7OxCloud/model"
 	"github.com/palp1tate/7OxCloud/proto/interaction"
 	"google.golang.org/grpc/codes"
@@ -17,8 +28,34 @@ type InteractionServer struct {
 	interactionProto.UnimplementedInteractionServiceServer
 }
 
+type MQMessage struct {
+	UserId    int64 `json:"uid"`
+	VideoId   int64 `json:"vid"`
+	Timestamp int64 `json:"timestamp"`
+}
+
+func (s *InteractionServer) ViewVideo(ctx context.Context, req *interactionProto.ViewVideoRequest) (*empty.Empty, error) {
+	message := &MQMessage{
+		UserId:    req.UserId,
+		VideoId:   req.VideoId,
+		Timestamp: time.Now().Unix(),
+	}
+	body, _ := json.Marshal(&message)
+	err := mq.SendMessage2MQ(body, consts.ViewVideoQueue)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "观看视频失败")
+	}
+	return &empty.Empty{}, nil
+}
+
 func (s *InteractionServer) LikeVideo(ctx context.Context, req *interactionProto.LikeVideoRequest) (*empty.Empty, error) {
-	err := dao.LikeVideo(req.UserId, req.VideoId)
+	message := &MQMessage{
+		UserId:    req.UserId,
+		VideoId:   req.VideoId,
+		Timestamp: time.Now().Unix(),
+	}
+	body, _ := json.Marshal(&message)
+	err := mq.SendMessage2MQ(body, consts.LikeVideoQueue)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "点赞视频失败")
 	}
@@ -34,7 +71,13 @@ func (s *InteractionServer) CancelLikeVideo(ctx context.Context, req *interactio
 }
 
 func (s *InteractionServer) CollectVideo(ctx context.Context, req *interactionProto.CollectVideoRequest) (*empty.Empty, error) {
-	err := dao.CollectVideo(req.UserId, req.VideoId)
+	message := &MQMessage{
+		UserId:    req.UserId,
+		VideoId:   req.VideoId,
+		Timestamp: time.Now().Unix(),
+	}
+	body, _ := json.Marshal(&message)
+	err := mq.SendMessage2MQ(body, consts.CollectVideoQueue)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "收藏视频失败")
 	}
@@ -156,4 +199,55 @@ func TopicModelToResponse(topic *model.Topic) *interactionProto.Topic {
 		Id:          topic.ID,
 		Description: topic.Description,
 	}
+}
+
+func VideoLogToCSV(uid int64, vid int64, isLike int64, isCollect int64, timestamp int64) (err error) {
+	InitCSVFile()
+	fileName := consts.CSVFilePath
+	file, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0o666)
+	if err != nil {
+		zap.S().Warnf("打开文件失败: %s", err.Error())
+	}
+	defer file.Close()
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+	err = writer.Write([]string{
+		strconv.FormatInt(uid, 10),
+		strconv.FormatInt(vid, 10),
+		strconv.FormatInt(isLike, 10),
+		strconv.FormatInt(isCollect, 10),
+		strconv.FormatInt(timestamp, 10),
+	})
+	if err != nil {
+		zap.S().Warnf("写入文件失败: %s", err.Error())
+	}
+	return
+}
+
+func RecordViewVideo(ctx context.Context, message *MQMessage) (err error) {
+	err = global.RedisClient.ZAdd(ctx, fmt.Sprintf("history:%d", message.UserId),
+		&redis.Z{Score: float64(message.Timestamp), Member: message.VideoId}).Err()
+	if err != nil {
+		zap.S().Warnf("记录观看历史失败: %s", err.Error())
+	}
+	err = VideoLogToCSV(message.UserId, message.VideoId, 0, 0, message.Timestamp)
+	return
+}
+
+func RecordLikeVideo(ctx context.Context, message *MQMessage) (err error) {
+	err = dao.LikeVideo(message.UserId, message.VideoId)
+	if err != nil {
+		zap.S().Warnf("点赞视频失败: %s", err.Error())
+	}
+	err = VideoLogToCSV(message.UserId, message.VideoId, 1, 0, message.Timestamp)
+	return
+}
+
+func RecordCollectVideo(ctx context.Context, message *MQMessage) (err error) {
+	err = dao.CollectVideo(message.UserId, message.VideoId)
+	if err != nil {
+		zap.S().Warnf("收藏视频失败: %s", err.Error())
+	}
+	err = VideoLogToCSV(message.UserId, message.VideoId, 0, 1, message.Timestamp)
+	return
 }

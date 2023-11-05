@@ -54,23 +54,43 @@ func Follow(c *gin.Context) {
 	return
 }
 
-func GetFollowing(c *gin.Context) {
-	latestTime := util.String2Int64(c.Query("latestTime"))
-	if latestTime == 0 {
-		latestTime = time.Now().Unix()
+func RemoveFan(c *gin.Context) {
+	fanId := util.String2Int64(c.Query("fanId"))
+	if fanId == 0 {
+		HandleHttpResponse(c, http.StatusBadRequest, "fanId不能为空", nil, nil)
+		return
 	}
+	currentUserId := int64(c.GetInt("userId"))
+	_, err := global.SocialServiceClient.CancelFollow(c, &socialProto.CancelFollowRequest{
+		FanId:  fanId,
+		UserId: currentUserId,
+	})
+	if err != nil {
+		HandleGrpcErrorToHttp(c, err)
+		return
+	}
+	token := c.GetString("token")
+	j := middleware.NewJWT()
+	refreshedToken, _ := j.RefreshToken(token)
+	HandleHttpResponse(c, http.StatusOK, "移除粉丝成功", refreshedToken, nil)
+}
+
+func GetFollowing(c *gin.Context) {
 	uid := util.String2Int64(c.Query("uid"))
 	currentUserId := int64(c.GetInt("userId"))
 	if uid == 0 {
 		uid = currentUserId
 	}
 	res, err := global.SocialServiceClient.GetFollowing(c, &socialProto.GetFollowingRequest{
-		UserId:     uid,
-		LatestTime: latestTime,
+		CurrentUserId: uid,
 	})
 	if err != nil {
 		HandleGrpcErrorToHttp(c, err)
 		return
+	}
+	followings := make([]gin.H, len(res.Followings))
+	for i, following := range res.Followings {
+		followings[i] = FollowingToResponse(following)
 	}
 	var refreshedToken interface{}
 	if currentUserId != 0 {
@@ -79,29 +99,53 @@ func GetFollowing(c *gin.Context) {
 		refreshedToken, _ = j.RefreshToken(token)
 	}
 	HandleHttpResponse(c, http.StatusOK, "获取关注列表成功", refreshedToken, gin.H{
-		"followings": res.Followings,
+		"followings": followings,
 		"count":      res.Count,
-		"nextTime":   res.NextTime,
 	})
 }
 
-func GetFan(c *gin.Context) {
-	latestTime := util.String2Int64(c.Query("latestTime"))
-	if latestTime == 0 {
-		latestTime = time.Now().Unix()
+func SearchFollowing(c *gin.Context) {
+	currentUserId := int64(c.GetInt("userId"))
+	keyword := c.Query("keyword")
+	if keyword == "" {
+		HandleHttpResponse(c, http.StatusBadRequest, "keyword不能为空", nil, nil)
+		return
 	}
+	res, err := global.SocialServiceClient.SearchFollowing(c, &socialProto.SearchRequest{
+		CurrentUserId: currentUserId,
+		Keyword:       keyword,
+	})
+	if err != nil {
+		HandleGrpcErrorToHttp(c, err)
+		return
+	}
+	followings := make([]gin.H, len(res.Followings))
+	for i, following := range res.Followings {
+		followings[i] = FollowingToResponse(following)
+	}
+	token := c.GetString("token")
+	j := middleware.NewJWT()
+	refreshedToken, _ := j.RefreshToken(token)
+	HandleHttpResponse(c, http.StatusOK, "搜索关注列表成功", refreshedToken, followings)
+	return
+}
+
+func GetFan(c *gin.Context) {
 	uid := util.String2Int64(c.Query("uid"))
 	currentUserId := int64(c.GetInt("userId"))
 	if uid == 0 {
 		uid = currentUserId
 	}
 	res, err := global.SocialServiceClient.GetFan(c, &socialProto.GetFanRequest{
-		UserId:     uid,
-		LatestTime: latestTime,
+		CurrentUserId: uid,
 	})
 	if err != nil {
 		HandleGrpcErrorToHttp(c, err)
 		return
+	}
+	fans := make([]gin.H, len(res.Fans))
+	for i, fan := range res.Fans {
+		fans[i] = FanToResponse(fan)
 	}
 	var refreshedToken interface{}
 	if currentUserId != 0 {
@@ -110,10 +154,35 @@ func GetFan(c *gin.Context) {
 		refreshedToken, _ = j.RefreshToken(token)
 	}
 	HandleHttpResponse(c, http.StatusOK, "获取粉丝列表成功", refreshedToken, gin.H{
-		"fans":     res.Fans,
-		"count":    res.Count,
-		"nextTime": res.NextTime,
+		"fans":  res.Fans,
+		"count": res.Count,
 	})
+}
+
+func SearchFan(c *gin.Context) {
+	currentUserId := int64(c.GetInt("userId"))
+	keyword := c.Query("keyword")
+	if keyword == "" {
+		HandleHttpResponse(c, http.StatusBadRequest, "keyword不能为空", nil, nil)
+		return
+	}
+	res, err := global.SocialServiceClient.SearchFan(c, &socialProto.SearchRequest{
+		CurrentUserId: currentUserId,
+		Keyword:       keyword,
+	})
+	if err != nil {
+		HandleGrpcErrorToHttp(c, err)
+		return
+	}
+	fans := make([]gin.H, len(res.Fans))
+	for i, fan := range res.Fans {
+		fans[i] = FanToResponse(fan)
+	}
+	token := c.GetString("token")
+	j := middleware.NewJWT()
+	refreshedToken, _ := j.RefreshToken(token)
+	HandleHttpResponse(c, http.StatusOK, "搜索粉丝列表成功", refreshedToken, fans)
+	return
 }
 
 func FollowFeed(c *gin.Context) {
@@ -186,5 +255,25 @@ func Video2Response(video *socialProto.Video) gin.H {
 		"topics":       video.Topics,
 		"author":       video.Author,
 		"publishTime":  video.PublishTime,
+	}
+}
+
+func FollowingToResponse(following *socialProto.Following) gin.H {
+	return gin.H{
+		"uid":       following.Id,
+		"username":  following.Username,
+		"avatar":    following.Avatar,
+		"signature": following.Signature,
+		"isFan":     following.IsFan,
+	}
+}
+
+func FanToResponse(fan *socialProto.Fan) gin.H {
+	return gin.H{
+		"uid":       fan.Id,
+		"username":  fan.Username,
+		"avatar":    fan.Avatar,
+		"signature": fan.Signature,
+		"isFollow":  fan.IsFollow,
 	}
 }

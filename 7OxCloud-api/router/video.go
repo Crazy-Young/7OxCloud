@@ -10,6 +10,8 @@ func InitVideoRouter(Router *gin.RouterGroup) {
 	VideoRouter := Router.Group("/video", middleware.JWTAuth())
 	{
 		VideoRouter.GET("/feed", api.Feed)
+		VideoRouter.GET("/recommended_feed", api.RecommendedFeed)
+		VideoRouter.GET("/history_feed", api.HistoryFeed)
 		VideoRouter.POST("/publish", api.Publish)
 		VideoRouter.GET("/get_video", api.GetVideo)
 		VideoRouter.GET("/publish_list", api.PublishList)

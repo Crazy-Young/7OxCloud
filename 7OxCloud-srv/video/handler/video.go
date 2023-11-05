@@ -9,7 +9,9 @@ import (
 	"github.com/palp1tate/7OxCloud/7OxCloud-srv/video/dao"
 	"github.com/palp1tate/7OxCloud/7OxCloud-srv/video/global"
 	"github.com/palp1tate/7OxCloud/model"
+	"github.com/palp1tate/7OxCloud/proto/transport"
 	"github.com/palp1tate/7OxCloud/proto/video"
+	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
@@ -39,6 +41,48 @@ func (s *VideoServer) Feed(ctx context.Context, req *videoProto.FeedRequest) (*v
 	return res, nil
 }
 
+func (s *VideoServer) RecommendedFeed(ctx context.Context, req *videoProto.FeedRequest) (*videoProto.FeedResponse, error) {
+	var videoList []*model.Video
+	res, err := global.TransportServiceClient.GetRecommendedFeed(context.Background(),
+		&transportProto.GetRecommendedFeedRequest{UserId: req.CurrentUserId})
+	if err != nil {
+		zap.S().Warnf("连接推荐系统服务器失败: %v", err)
+		videoList, err = dao.GetRecommendedVideos([]int64{}, req.CurrentUserId)
+	} else {
+		videoList, err = dao.GetRecommendedVideos(res.VideoId, req.CurrentUserId)
+	}
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "获取推荐视频流失败")
+	}
+	videos := make([]*videoProto.Video, len(videoList))
+	for i, video := range videoList {
+		videos[i] = VideoModelToResponse(video, req.CurrentUserId)
+	}
+	return &videoProto.FeedResponse{
+		Videos: videos,
+	}, nil
+}
+
+func (s *VideoServer) HistoryFeed(ctx context.Context, req *videoProto.FeedRequest) (*videoProto.HistoryFeedResponse, error) {
+	latestTime := time.Unix(req.LatestTime, 0)
+	videoList, err := dao.GetHistoryVideos(latestTime, req.CurrentUserId)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "获取视频流失败")
+	}
+	if len(videoList) == 0 {
+		return &videoProto.HistoryFeedResponse{}, nil
+	}
+	videos := make([]*videoProto.SmallVideo, len(videoList))
+	for i, video := range videoList {
+		videos[i] = SmallVideoModelToResponse(video)
+	}
+	res := &videoProto.HistoryFeedResponse{
+		Videos:   videos,
+		NextTime: videoList[len(videoList)-1].CreatedAt.Unix(),
+	}
+	return res, nil
+}
+
 func (s *VideoServer) Publish(ctx context.Context, req *videoProto.PublishRequest) (*empty.Empty, error) {
 	node, err := snowflake.NewNode(1)
 	if err != nil {
@@ -59,9 +103,9 @@ func (s *VideoServer) Publish(ctx context.Context, req *videoProto.PublishReques
 	return &empty.Empty{}, nil
 }
 
-func (s *VideoServer) PublishList(ctx context.Context, req *videoProto.PublishListRequest) (*videoProto.PublishListResponse, error) {
+func (s *VideoServer) PublishList(ctx context.Context, req *videoProto.FeedRequest) (*videoProto.PublishListResponse, error) {
 	latestTime := time.Unix(req.LatestTime, 0)
-	videoList, err := dao.GetVideosByUserId(latestTime, req.UserId)
+	videoList, err := dao.GetVideosByUserId(latestTime, req.CurrentUserId)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "获取视频列表失败")
 	}
@@ -180,9 +224,8 @@ func (s *VideoServer) FeedBySearch(ctx context.Context, req *videoProto.FeedBySe
 	return res, nil
 }
 
-func (s *VideoServer) HotFeed(ctx context.Context, req *videoProto.FeedRequest) (*videoProto.MiniFeedResponse, error) {
-	latestTime := time.Unix(req.LatestTime, 0)
-	videoList, err := dao.GetHotVideos(latestTime)
+func (s *VideoServer) HotFeed(ctx context.Context, req *videoProto.HotFeedRequest) (*videoProto.MiniFeedResponse, error) {
+	videoList, err := dao.GetHotVideos()
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "获取热点视频流失败")
 	}
@@ -190,12 +233,16 @@ func (s *VideoServer) HotFeed(ctx context.Context, req *videoProto.FeedRequest) 
 		return &videoProto.MiniFeedResponse{}, nil
 	}
 	videos := make([]*videoProto.MiniVideo, len(videoList))
+	nextTime := videoList[0].CreatedAt.Unix()
 	for i, video := range videoList {
+		if video.CreatedAt.Unix() < nextTime {
+			nextTime = video.CreatedAt.Unix()
+		}
 		videos[i] = MiniVideoModelToResponse(video, req.CurrentUserId)
 	}
 	res := &videoProto.MiniFeedResponse{
 		Videos:   videos,
-		NextTime: videoList[len(videoList)-1].CreatedAt.Unix(),
+		NextTime: nextTime,
 	}
 	return res, nil
 }

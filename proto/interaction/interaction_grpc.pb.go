@@ -23,6 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type InteractionServiceClient interface {
+	ViewVideo(ctx context.Context, in *ViewVideoRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	LikeVideo(ctx context.Context, in *LikeVideoRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	CancelLikeVideo(ctx context.Context, in *CancelLikeVideoRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetLikeList(ctx context.Context, in *GetLikeListRequest, opts ...grpc.CallOption) (*FeedResponse, error)
@@ -40,6 +41,15 @@ type interactionServiceClient struct {
 
 func NewInteractionServiceClient(cc grpc.ClientConnInterface) InteractionServiceClient {
 	return &interactionServiceClient{cc}
+}
+
+func (c *interactionServiceClient) ViewVideo(ctx context.Context, in *ViewVideoRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/interactionProto.InteractionService/ViewVideo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *interactionServiceClient) LikeVideo(ctx context.Context, in *LikeVideoRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
@@ -127,6 +137,7 @@ func (c *interactionServiceClient) DeleteComment(ctx context.Context, in *Delete
 // All implementations must embed UnimplementedInteractionServiceServer
 // for forward compatibility
 type InteractionServiceServer interface {
+	ViewVideo(context.Context, *ViewVideoRequest) (*emptypb.Empty, error)
 	LikeVideo(context.Context, *LikeVideoRequest) (*emptypb.Empty, error)
 	CancelLikeVideo(context.Context, *CancelLikeVideoRequest) (*emptypb.Empty, error)
 	GetLikeList(context.Context, *GetLikeListRequest) (*FeedResponse, error)
@@ -143,6 +154,9 @@ type InteractionServiceServer interface {
 type UnimplementedInteractionServiceServer struct {
 }
 
+func (UnimplementedInteractionServiceServer) ViewVideo(context.Context, *ViewVideoRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ViewVideo not implemented")
+}
 func (UnimplementedInteractionServiceServer) LikeVideo(context.Context, *LikeVideoRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LikeVideo not implemented")
 }
@@ -181,6 +195,24 @@ type UnsafeInteractionServiceServer interface {
 
 func RegisterInteractionServiceServer(s grpc.ServiceRegistrar, srv InteractionServiceServer) {
 	s.RegisterService(&InteractionService_ServiceDesc, srv)
+}
+
+func _InteractionService_ViewVideo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ViewVideoRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InteractionServiceServer).ViewVideo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/interactionProto.InteractionService/ViewVideo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InteractionServiceServer).ViewVideo(ctx, req.(*ViewVideoRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _InteractionService_LikeVideo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -352,6 +384,10 @@ var InteractionService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "interactionProto.InteractionService",
 	HandlerType: (*InteractionServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "ViewVideo",
+			Handler:    _InteractionService_ViewVideo_Handler,
+		},
 		{
 			MethodName: "LikeVideo",
 			Handler:    _InteractionService_LikeVideo_Handler,

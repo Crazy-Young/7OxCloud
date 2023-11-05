@@ -29,6 +29,8 @@ type SocialServiceClient interface {
 	GetFan(ctx context.Context, in *GetFanRequest, opts ...grpc.CallOption) (*GetFanResponse, error)
 	FollowFeed(ctx context.Context, in *FollowFeedRequest, opts ...grpc.CallOption) (*FeedResponse, error)
 	FriendFeed(ctx context.Context, in *FriendFeedRequest, opts ...grpc.CallOption) (*FeedResponse, error)
+	SearchFollowing(ctx context.Context, in *SearchRequest, opts ...grpc.CallOption) (*SearchFollowingResponse, error)
+	SearchFan(ctx context.Context, in *SearchRequest, opts ...grpc.CallOption) (*SearchFanResponse, error)
 }
 
 type socialServiceClient struct {
@@ -93,6 +95,24 @@ func (c *socialServiceClient) FriendFeed(ctx context.Context, in *FriendFeedRequ
 	return out, nil
 }
 
+func (c *socialServiceClient) SearchFollowing(ctx context.Context, in *SearchRequest, opts ...grpc.CallOption) (*SearchFollowingResponse, error) {
+	out := new(SearchFollowingResponse)
+	err := c.cc.Invoke(ctx, "/socialProto.SocialService/SearchFollowing", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *socialServiceClient) SearchFan(ctx context.Context, in *SearchRequest, opts ...grpc.CallOption) (*SearchFanResponse, error) {
+	out := new(SearchFanResponse)
+	err := c.cc.Invoke(ctx, "/socialProto.SocialService/SearchFan", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SocialServiceServer is the server API for SocialService service.
 // All implementations must embed UnimplementedSocialServiceServer
 // for forward compatibility
@@ -103,6 +123,8 @@ type SocialServiceServer interface {
 	GetFan(context.Context, *GetFanRequest) (*GetFanResponse, error)
 	FollowFeed(context.Context, *FollowFeedRequest) (*FeedResponse, error)
 	FriendFeed(context.Context, *FriendFeedRequest) (*FeedResponse, error)
+	SearchFollowing(context.Context, *SearchRequest) (*SearchFollowingResponse, error)
+	SearchFan(context.Context, *SearchRequest) (*SearchFanResponse, error)
 	mustEmbedUnimplementedSocialServiceServer()
 }
 
@@ -127,6 +149,12 @@ func (UnimplementedSocialServiceServer) FollowFeed(context.Context, *FollowFeedR
 }
 func (UnimplementedSocialServiceServer) FriendFeed(context.Context, *FriendFeedRequest) (*FeedResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FriendFeed not implemented")
+}
+func (UnimplementedSocialServiceServer) SearchFollowing(context.Context, *SearchRequest) (*SearchFollowingResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SearchFollowing not implemented")
+}
+func (UnimplementedSocialServiceServer) SearchFan(context.Context, *SearchRequest) (*SearchFanResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SearchFan not implemented")
 }
 func (UnimplementedSocialServiceServer) mustEmbedUnimplementedSocialServiceServer() {}
 
@@ -249,6 +277,42 @@ func _SocialService_FriendFeed_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _SocialService_SearchFollowing_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SearchRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SocialServiceServer).SearchFollowing(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/socialProto.SocialService/SearchFollowing",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SocialServiceServer).SearchFollowing(ctx, req.(*SearchRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SocialService_SearchFan_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SearchRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SocialServiceServer).SearchFan(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/socialProto.SocialService/SearchFan",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SocialServiceServer).SearchFan(ctx, req.(*SearchRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // SocialService_ServiceDesc is the grpc.ServiceDesc for SocialService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -279,6 +343,14 @@ var SocialService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "FriendFeed",
 			Handler:    _SocialService_FriendFeed_Handler,
+		},
+		{
+			MethodName: "SearchFollowing",
+			Handler:    _SocialService_SearchFollowing_Handler,
+		},
+		{
+			MethodName: "SearchFan",
+			Handler:    _SocialService_SearchFan_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

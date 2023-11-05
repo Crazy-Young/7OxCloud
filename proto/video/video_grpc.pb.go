@@ -24,15 +24,17 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type VideoServiceClient interface {
 	Feed(ctx context.Context, in *FeedRequest, opts ...grpc.CallOption) (*MiniFeedResponse, error)
+	RecommendedFeed(ctx context.Context, in *FeedRequest, opts ...grpc.CallOption) (*FeedResponse, error)
+	HistoryFeed(ctx context.Context, in *FeedRequest, opts ...grpc.CallOption) (*HistoryFeedResponse, error)
 	Publish(ctx context.Context, in *PublishRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	Video(ctx context.Context, in *VideoRequest, opts ...grpc.CallOption) (*VideoResponse, error)
-	PublishList(ctx context.Context, in *PublishListRequest, opts ...grpc.CallOption) (*PublishListResponse, error)
+	PublishList(ctx context.Context, in *FeedRequest, opts ...grpc.CallOption) (*PublishListResponse, error)
 	FeedByTopic(ctx context.Context, in *FeedByTopicRequest, opts ...grpc.CallOption) (*FeedResponse, error)
 	CategoryList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*CategoryListResponse, error)
 	TopicList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*TopicListResponse, error)
 	FeedByCategory(ctx context.Context, in *FeedByCategoryRequest, opts ...grpc.CallOption) (*MiniFeedResponse, error)
 	FeedBySearch(ctx context.Context, in *FeedBySearchRequest, opts ...grpc.CallOption) (*FeedResponse, error)
-	HotFeed(ctx context.Context, in *FeedRequest, opts ...grpc.CallOption) (*MiniFeedResponse, error)
+	HotFeed(ctx context.Context, in *HotFeedRequest, opts ...grpc.CallOption) (*MiniFeedResponse, error)
 	DeleteVideo(ctx context.Context, in *VideoRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
@@ -47,6 +49,24 @@ func NewVideoServiceClient(cc grpc.ClientConnInterface) VideoServiceClient {
 func (c *videoServiceClient) Feed(ctx context.Context, in *FeedRequest, opts ...grpc.CallOption) (*MiniFeedResponse, error) {
 	out := new(MiniFeedResponse)
 	err := c.cc.Invoke(ctx, "/videoProto.VideoService/Feed", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *videoServiceClient) RecommendedFeed(ctx context.Context, in *FeedRequest, opts ...grpc.CallOption) (*FeedResponse, error) {
+	out := new(FeedResponse)
+	err := c.cc.Invoke(ctx, "/videoProto.VideoService/RecommendedFeed", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *videoServiceClient) HistoryFeed(ctx context.Context, in *FeedRequest, opts ...grpc.CallOption) (*HistoryFeedResponse, error) {
+	out := new(HistoryFeedResponse)
+	err := c.cc.Invoke(ctx, "/videoProto.VideoService/HistoryFeed", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +91,7 @@ func (c *videoServiceClient) Video(ctx context.Context, in *VideoRequest, opts .
 	return out, nil
 }
 
-func (c *videoServiceClient) PublishList(ctx context.Context, in *PublishListRequest, opts ...grpc.CallOption) (*PublishListResponse, error) {
+func (c *videoServiceClient) PublishList(ctx context.Context, in *FeedRequest, opts ...grpc.CallOption) (*PublishListResponse, error) {
 	out := new(PublishListResponse)
 	err := c.cc.Invoke(ctx, "/videoProto.VideoService/PublishList", in, out, opts...)
 	if err != nil {
@@ -125,7 +145,7 @@ func (c *videoServiceClient) FeedBySearch(ctx context.Context, in *FeedBySearchR
 	return out, nil
 }
 
-func (c *videoServiceClient) HotFeed(ctx context.Context, in *FeedRequest, opts ...grpc.CallOption) (*MiniFeedResponse, error) {
+func (c *videoServiceClient) HotFeed(ctx context.Context, in *HotFeedRequest, opts ...grpc.CallOption) (*MiniFeedResponse, error) {
 	out := new(MiniFeedResponse)
 	err := c.cc.Invoke(ctx, "/videoProto.VideoService/HotFeed", in, out, opts...)
 	if err != nil {
@@ -148,15 +168,17 @@ func (c *videoServiceClient) DeleteVideo(ctx context.Context, in *VideoRequest, 
 // for forward compatibility
 type VideoServiceServer interface {
 	Feed(context.Context, *FeedRequest) (*MiniFeedResponse, error)
+	RecommendedFeed(context.Context, *FeedRequest) (*FeedResponse, error)
+	HistoryFeed(context.Context, *FeedRequest) (*HistoryFeedResponse, error)
 	Publish(context.Context, *PublishRequest) (*emptypb.Empty, error)
 	Video(context.Context, *VideoRequest) (*VideoResponse, error)
-	PublishList(context.Context, *PublishListRequest) (*PublishListResponse, error)
+	PublishList(context.Context, *FeedRequest) (*PublishListResponse, error)
 	FeedByTopic(context.Context, *FeedByTopicRequest) (*FeedResponse, error)
 	CategoryList(context.Context, *emptypb.Empty) (*CategoryListResponse, error)
 	TopicList(context.Context, *emptypb.Empty) (*TopicListResponse, error)
 	FeedByCategory(context.Context, *FeedByCategoryRequest) (*MiniFeedResponse, error)
 	FeedBySearch(context.Context, *FeedBySearchRequest) (*FeedResponse, error)
-	HotFeed(context.Context, *FeedRequest) (*MiniFeedResponse, error)
+	HotFeed(context.Context, *HotFeedRequest) (*MiniFeedResponse, error)
 	DeleteVideo(context.Context, *VideoRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedVideoServiceServer()
 }
@@ -168,13 +190,19 @@ type UnimplementedVideoServiceServer struct {
 func (UnimplementedVideoServiceServer) Feed(context.Context, *FeedRequest) (*MiniFeedResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Feed not implemented")
 }
+func (UnimplementedVideoServiceServer) RecommendedFeed(context.Context, *FeedRequest) (*FeedResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RecommendedFeed not implemented")
+}
+func (UnimplementedVideoServiceServer) HistoryFeed(context.Context, *FeedRequest) (*HistoryFeedResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method HistoryFeed not implemented")
+}
 func (UnimplementedVideoServiceServer) Publish(context.Context, *PublishRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Publish not implemented")
 }
 func (UnimplementedVideoServiceServer) Video(context.Context, *VideoRequest) (*VideoResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Video not implemented")
 }
-func (UnimplementedVideoServiceServer) PublishList(context.Context, *PublishListRequest) (*PublishListResponse, error) {
+func (UnimplementedVideoServiceServer) PublishList(context.Context, *FeedRequest) (*PublishListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PublishList not implemented")
 }
 func (UnimplementedVideoServiceServer) FeedByTopic(context.Context, *FeedByTopicRequest) (*FeedResponse, error) {
@@ -192,7 +220,7 @@ func (UnimplementedVideoServiceServer) FeedByCategory(context.Context, *FeedByCa
 func (UnimplementedVideoServiceServer) FeedBySearch(context.Context, *FeedBySearchRequest) (*FeedResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FeedBySearch not implemented")
 }
-func (UnimplementedVideoServiceServer) HotFeed(context.Context, *FeedRequest) (*MiniFeedResponse, error) {
+func (UnimplementedVideoServiceServer) HotFeed(context.Context, *HotFeedRequest) (*MiniFeedResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method HotFeed not implemented")
 }
 func (UnimplementedVideoServiceServer) DeleteVideo(context.Context, *VideoRequest) (*emptypb.Empty, error) {
@@ -225,6 +253,42 @@ func _VideoService_Feed_Handler(srv interface{}, ctx context.Context, dec func(i
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(VideoServiceServer).Feed(ctx, req.(*FeedRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VideoService_RecommendedFeed_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FeedRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VideoServiceServer).RecommendedFeed(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/videoProto.VideoService/RecommendedFeed",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VideoServiceServer).RecommendedFeed(ctx, req.(*FeedRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VideoService_HistoryFeed_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FeedRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VideoServiceServer).HistoryFeed(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/videoProto.VideoService/HistoryFeed",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VideoServiceServer).HistoryFeed(ctx, req.(*FeedRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -266,7 +330,7 @@ func _VideoService_Video_Handler(srv interface{}, ctx context.Context, dec func(
 }
 
 func _VideoService_PublishList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PublishListRequest)
+	in := new(FeedRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -278,7 +342,7 @@ func _VideoService_PublishList_Handler(srv interface{}, ctx context.Context, dec
 		FullMethod: "/videoProto.VideoService/PublishList",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(VideoServiceServer).PublishList(ctx, req.(*PublishListRequest))
+		return srv.(VideoServiceServer).PublishList(ctx, req.(*FeedRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -374,7 +438,7 @@ func _VideoService_FeedBySearch_Handler(srv interface{}, ctx context.Context, de
 }
 
 func _VideoService_HotFeed_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(FeedRequest)
+	in := new(HotFeedRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -386,7 +450,7 @@ func _VideoService_HotFeed_Handler(srv interface{}, ctx context.Context, dec fun
 		FullMethod: "/videoProto.VideoService/HotFeed",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(VideoServiceServer).HotFeed(ctx, req.(*FeedRequest))
+		return srv.(VideoServiceServer).HotFeed(ctx, req.(*HotFeedRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -419,6 +483,14 @@ var VideoService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Feed",
 			Handler:    _VideoService_Feed_Handler,
+		},
+		{
+			MethodName: "RecommendedFeed",
+			Handler:    _VideoService_RecommendedFeed_Handler,
+		},
+		{
+			MethodName: "HistoryFeed",
+			Handler:    _VideoService_HistoryFeed_Handler,
 		},
 		{
 			MethodName: "Publish",

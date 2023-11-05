@@ -18,10 +18,21 @@ type ConsulConfig struct {
 	Port int    `json:"port"`
 }
 
+type RecommendConfig struct {
+	Host string `json:"host"`
+	Port int    `json:"port"`
+}
+type RedisConfig struct {
+	Host string `json:"host"`
+	Port int    `json:"port"`
+}
+
 type ServerConfig struct {
-	Service ServiceConfig `json:"service"`
-	MySQL   MySQLConfig   `json:"mysql"`
-	Consul  ConsulConfig  `json:"consul"`
+	Service   ServiceConfig   `json:"service"`
+	MySQL     MySQLConfig     `json:"mysql"`
+	Consul    ConsulConfig    `json:"consul"`
+	Recommend RecommendConfig `json:"recommend"`
+	Redis     RedisConfig     `json:"redis"`
 }
 
 type NacosConfig struct {

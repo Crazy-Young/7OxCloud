@@ -4,6 +4,7 @@ package interactionProto;
 option go_package = ".;interactionProto";
 
 service InteractionService {
+  rpc ViewVideo(ViewVideoRequest) returns (google.protobuf.Empty) {}
   rpc LikeVideo(LikeVideoRequest) returns (google.protobuf.Empty) {}
   rpc CancelLikeVideo(CancelLikeVideoRequest) returns (google.protobuf.Empty) {}
   rpc GetLikeList(GetLikeListRequest) returns (FeedResponse) {}
@@ -13,6 +14,11 @@ service InteractionService {
   rpc Comment(CommentRequest) returns (google.protobuf.Empty) {}
   rpc GetCommentList(GetCommentListRequest) returns (GetCommentListResponse) {}
   rpc DeleteComment(DeleteCommentRequest) returns (google.protobuf.Empty) {}
+}
+
+message ViewVideoRequest{
+  int64 userId = 1;
+  int64 videoId = 2;
 }
 
 message LikeVideoRequest{

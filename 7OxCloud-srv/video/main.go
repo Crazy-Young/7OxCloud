@@ -18,6 +18,8 @@ func main() {
 	initialize.InitConfig()
 	initialize.InitLogger()
 	initialize.InitMySQL()
+	initialize.InitRedis()
+	initialize.InitServiceConn()
 
 	host := global.ServerConfig.Service.Host
 	port := flag.Int("p", 0, "端口号")

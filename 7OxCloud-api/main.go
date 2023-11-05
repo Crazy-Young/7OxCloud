@@ -25,6 +25,8 @@ func main() {
 	initialize.InitValidator()
 	initialize.InitServiceConn()
 
+	defer global.RedisClient.Close()
+
 	host := global.ServerConfig.Api.Host
 	port := flag.Int("p", 0, "端口号")
 	flag.Parse()
