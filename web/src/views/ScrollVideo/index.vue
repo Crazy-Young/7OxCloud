@@ -14,8 +14,8 @@
                             </p>
                             <p class="video-info-time">{{ formatTime(item.publishTime) }}</p>
                         </div>
-                        <el-button class="video-info-follow" :class="{ 'follow': item.author.isFollow }"
-                            @click="handleFollow(item)" v-if="item.author.uid !== userInfo.uid">{{ item.author.isFollow
+                        <el-button :loading="loading && uid === item.author.uid" :disabled="loading && uid === item.author.uid" class="video-info-follow" :class="{ 'follow': item.author.isFollow }"
+                            @click="handleFollow(item)" v-if="item.author.uid !== userInfo.uid">{{ loading && uid === item.author.uid && item.author.isFollow ? '取关中' : loading && uid === item.author.uid && !item.author.isFollow ? '关注中' : item.author.isFollow
                                 ? '已关注' : '关注' }}</el-button>
                     </div>
                     <p class="video-info-desc">
@@ -28,7 +28,8 @@
                 </div>
             </div>
         </div>
-        <DataStatus :isDataEnd="isDataEnd" :length="videoList.length" ref="loading" @getVideoList="getVideoList"></DataStatus>
+        <DataStatus :isDataEnd="isDataEnd" :length="videoList.length" ref="loading" @getVideoList="getVideoList">
+        </DataStatus>
     </div>
 </template>
 
@@ -43,6 +44,12 @@ import { FollowUser } from '@/api/user';
 import PlayerWithMethod from '@/components/PlayerWithMethod.vue';
 export default {
     name: "ScrollVideo",
+    data() {
+        return {
+            loading: false,
+            uid: null
+        }
+    },
     props: {
         videoList: {
             type: Array,
@@ -66,21 +73,23 @@ export default {
             this.$emit("getVideoList");
         },
         handleFollow(item) {
+            this.loading = true
+            this.uid = item.author.uid
             FollowUser({
                 userId: item.author.uid,
                 type: !item.author.isFollow ? 1 : 2
-            })
-            item.author.isFollow = !item.author.isFollow
-        },
-        handleComment(vid) {
-            this.$router.push({
-                name: 'Video',
-                params: {
-                    vid
-                },
-                query: {
-                    comment: true
+            }).then((res) => {
+                if (res.status === 200) {
+                    item.author.isFollow = !item.author.isFollow
+                    this.videoList.forEach(video => {
+                        if (video.author.uid === item.author.uid) {
+                            video.author.isFollow = item.author.isFollow
+                        }
+                    })
+                } else {
+                    this.$message.error(res.data.msg)
                 }
+                this.loading = false
             })
         }
     },
@@ -140,7 +149,7 @@ export default {
                         color: @white;
                         border: unset;
                         padding: 8px 0;
-                        width: 64px;
+                        width: 74px;
 
                         &.follow {
                             background-color: @transparent-dark;

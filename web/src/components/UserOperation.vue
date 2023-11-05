@@ -42,6 +42,7 @@ export default {
             if (res.status === 200) {
                 this.m_likeCount += this.m_isLike ? -1 : 1
                 this.m_isLike = !this.m_isLike
+                this.$message.success(res.data.msg)
                 this.$emit("handleLike", this.vid);
             }
         },
@@ -57,6 +58,7 @@ export default {
             if (res.status === 200) {
                 this.m_collectCount += this.m_isCollect ? -1 : 1
                 this.m_isCollect = !this.m_isCollect
+                this.$message.success(res.data.msg)
                 this.$emit("handleCollect", this.vid);
             }
         },
@@ -68,6 +70,7 @@ export default {
             if (!res) return
             if (res.status === 200) {
                 this.m_isFollow = !this.m_isFollow
+                this.$message.success(res.data.msg)
                 this.$emit("handleFollow", this.uid);
             }
         },

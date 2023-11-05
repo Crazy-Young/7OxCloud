@@ -1,11 +1,13 @@
 <template>
     <div class="home-container">
         <div class="home" id="home" ref="home">
-            <template v-if="!loading || videoList.length>15">
-                <VideoBox class="video" v-for="(item, index) in videoList" v-bind="item" :key="item.vid" ref="VideoBox"></VideoBox>
+            <template v-if="!loading || videoList.length > 15">
+                <VideoBox class="video" v-for="(item, index) in videoList" v-bind="item" :key="item.vid" ref="VideoBox">
+                </VideoBox>
             </template>
         </div>
-        <DataStatus :loading="loading" :isDataEnd="isDataEnd" :length="videoList.length" ref="loading" @getVideoList="getVideoList"></DataStatus>
+        <DataStatus :loading="loading" :isDataEnd="isDataEnd" :length="videoList.length" ref="loading"
+            @getVideoList="getVideoList"></DataStatus>
     </div>
 </template>
 
@@ -15,6 +17,7 @@ import waterFall from '@/utils/waterfallLayout';
 import { VideoListByTime } from '@/api/video';
 import DataStatus from '@/components/DataStatus.vue';
 import videoList from '@/mixins/videoList';
+import debounce from '@/utils/debounce';
 export default {
     name: "Home",
     mixins: [videoList],
@@ -28,16 +31,16 @@ export default {
         }
     },
     methods: {
-        // 设置瀑布流布局信息
-        waterfallLayout() {
+        // 设置瀑布流布局信息，防抖
+        waterfallLayout: debounce(function () {
             waterFall(this.$refs.home, window.innerWidth < 800 ? 2 : window.innerWidth < 1280 ? 3 : window.innerWidth < 1560 ? 4 : 5, 20)
-        },
+        }, 100, true),
         // 加载所有资源
         async loadAllSources() {
-            if(this.loading) return
+            if (this.loading) return
             this.loading = true
             for (let i = 0; i < this.videoList.length; i++) {
-                if(this.videoList[i].isLoaded) continue
+                if (this.videoList[i].isLoaded) continue
                 const video = document.createElement('video');
                 video.src = this.videoList[i].playUrl;
                 await new Promise((resolve, reject) => {

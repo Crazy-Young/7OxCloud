@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import { VideoInfo, ViewVideo } from '@/api/video';
+import { VideoInfo } from '@/api/video';
 import CloseIcon from '@/icons/CloseIcon.vue';
 import formatTime from '@/utils/formatTime';
 import Topic from '@/components/Topic.vue';
@@ -79,8 +79,6 @@ export default {
     },
     mounted() {
         this.getVideoInfo()
-        // 记录用户的浏览历史
-        ViewVideo(this.vid)
     }
 }
 </script>

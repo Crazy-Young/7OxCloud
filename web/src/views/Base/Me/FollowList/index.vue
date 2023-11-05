@@ -16,7 +16,7 @@
 
             <!-- 搜索框 -->
             <div class="panel__search">
-                <el-input clearable v-model="search">
+                <el-input clearable v-model="search" placeholder="搜索" @input="handleSearch">
                     <template #prefix>
                         <search-icon />
                     </template>
@@ -25,16 +25,16 @@
 
             <!-- 列表 -->
             <div class="panel-content">
-                <div class="list-item" v-for="item in activeIndex === 0 ? followList : fanList" :key="item.id">
-                    <el-avatar :size="60" :src="item.avatar"></el-avatar>
+                <div class="list-item" v-for="item in activeIndex === 0 ? followList : fanList" :key="item.id || item.uid">
+                    <router-link :to="`/user/${item.id || item.uid}`"><el-avatar :size="60" :src="item.avatar"></el-avatar></router-link>
                     <div class="info">
                         <p class="name">
-                            <router-link :to="`/user/${item.id}`">{{ item.username }}</router-link>
+                            <router-link :to="`/user/${item.id || item.uid}`">{{ item.username }}</router-link>
                         </p>
                         <p class="desc">{{ item.signature }}</p>
                     </div>
                     <el-button class="btn" :class="{ active: item.isFollow }" @click="handleFollow(item)">
-                        {{ item.isFollow ? '已关注' : '关注' }}
+                        {{ item.isFollow && item.isFan ? '互相关注' : item.isFollow ? '已关注' : item.isFan ? '回关' : '关注' }}
                     </el-button>
                     <!-- 如果是粉丝，那么可以移除 -->
                     <el-button class="btn active" v-if="activeIndex === 1" @click="handleRemoveFan(item)">移除</el-button>
@@ -46,8 +46,9 @@
 
 <script>
 import SearchIcon from "@/icons/SearchIcon.vue";
-import { FollowUser, RemoveFan } from "@/api/user";
+import { FollowUser, RemoveFan, SearchFollow, SearchFan } from "@/api/user";
 import { mapState, mapGetters } from "vuex";
+import debounce from "@/utils/debounce";
 export default {
     name: "FollowList",
     components: {
@@ -78,26 +79,52 @@ export default {
     methods: {
         handleFollow(item) {
             FollowUser({
-                userId: item.id,
+                userId: item.id || item.uid,
                 type: !item.isFollow ? 1 : 2
-            })
-            item.isFollow = !item.isFollow
-            if (this.activeIndex === 0) {
-                this.m_followCount += item.isFollow ? 1 : -1
-            } else {
-                this.m_fanCount += item.isFollow ? 1 : -1
-            }
-        },
-        handleRemoveFan(item) {
-            RemoveFan(item.id).then((res) => {
+            }).then((res) => {
                 if (res.status === 200) {
-                    this.m_fanCount -= 1
-                    this.$store.commit('SET_USER_FAN', this.fanList.filter(_ => _.id !== item.id))
+                    item.isFollow = !item.isFollow
+                    this.m_followCount += item.isFollow ? 1 : -1
+                    this.handleSearch()
                 } else {
                     this.$message.error(res.data.msg)
                 }
             })
-        }
+        },
+        handleRemoveFan(item) {
+            RemoveFan(item.id || item.uid).then((res) => {
+                if (res.status === 200) {
+                    this.m_fanCount -= 1
+                    this.handleSearch()
+                } else {
+                    this.$message.error(res.data.msg)
+                }
+            })
+        },
+        handleSearch: debounce(function () {
+            if (this.search.trim()) {
+                if (this.activeIndex === 0) {
+                    SearchFollow(this.search).then((res) => {
+                        if (res.status === 200) {
+                            this.$store.commit('SET_USER_FOLLOW', res.data.data)
+                        } else {
+                            this.$message.error(res.data.msg)
+                        }
+                    })
+                } else {
+                    SearchFan(this.search).then((res) => {
+                        if (res.status === 200) {
+                            this.$store.commit('SET_USER_FAN', res.data.data)
+                        } else {
+                            this.$message.error(res.data.msg)
+                        }
+                    })
+                }
+            } else {
+                this.$store.dispatch('UserFollowList')
+                this.$store.dispatch('UserFanList')
+            }
+        })
     }
 };
 </script>

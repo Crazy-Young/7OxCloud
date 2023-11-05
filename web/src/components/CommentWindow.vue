@@ -91,7 +91,9 @@ export default {
                 cid: null,
                 username: "",
                 content: ""
-            }
+            },
+            // 监听CommentWindow出现
+            observe: null
         }
     },
     methods: {
@@ -162,8 +164,18 @@ export default {
         }
     },
     mounted() {
-        // 获取评论
-        this.getCommentList()
+        // 监听CommentWindow出现
+        this.observe = new IntersectionObserver((entries) => {
+            // 只有一个元素被监听，所以entries[0]触发isIntersecting就更新数据
+            if (entries[0].isIntersecting) {
+                this.getCommentList()
+            }
+        }, {
+            // 观察的距交叉的距离
+            threshold: 1,
+        })
+
+        this.observe.observe(this.$refs.commentWindow)
     }
 }
 </script>
