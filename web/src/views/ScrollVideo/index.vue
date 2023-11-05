@@ -90,6 +90,8 @@ export default {
                     this.$message.error(res.data.msg)
                 }
                 this.loading = false
+            }).catch(() => {
+                this.loading = false
             })
         }
     },
@@ -150,6 +152,7 @@ export default {
                         border: unset;
                         padding: 8px 0;
                         width: 74px;
+                        outline: unset;
 
                         &.follow {
                             background-color: @transparent-dark;

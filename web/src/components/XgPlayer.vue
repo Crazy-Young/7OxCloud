@@ -10,8 +10,14 @@
 <script>
 import Xgplayer from "xgplayer";
 import { ViewVideo } from "@/api/video";
+import { mapState } from "vuex";
 export default {
     name: "XgPlayer",
+    computed: {
+        ...mapState({
+            userInfo: (state) => state.user.userInfo
+        }),
+    },
     props: {
         vid: {
             type: String | Number | Object,
@@ -111,7 +117,8 @@ export default {
     mounted() {
         this.initPlayer();
         this.player.on('play', () => {
-            ViewVideo(this.vid)
+            if (this.userInfo.uid)
+                ViewVideo(this.vid)
         })
     },
     beforeDestroy() {
