@@ -56,7 +56,7 @@ export default {
     },
     beforeDestroy() {
         // 取消监听
-        this.$refs.loading && this.observe.unobserve(this.$refs.loading.$el)
+        this.$refs.loading?.$el && this.observe.unobserve(this.$refs.loading.$el)
     }
 
 }

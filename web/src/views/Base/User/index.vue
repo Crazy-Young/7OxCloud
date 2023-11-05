@@ -37,13 +37,14 @@
                 <!-- 其他用户只能查看别人的作品 -->
                 <el-tab-pane :disabled="!userInfo.uid" class="video-container"
                     :label="`作品 ${userInfo.uid ? userInfo.workCount : ''}`" name="work">
-                    <VideoBox v-for="item in videoList" :key="item.vid" v-bind="item" :ratio="4 / 3"
-                        :waterfall="false" ref="VideoBox">
+                    <VideoBox v-for="item in videoList" :key="item.vid" v-bind="item" :ratio="4 / 3" :waterfall="false"
+                        ref="VideoBox">
                     </VideoBox>
                 </el-tab-pane>
             </el-tabs>
 
-            <DataStatus :isDataEnd="isDataEnd" :length="videoList.length" ref="loading" @getVideoList="getVideoList"></DataStatus>
+            <DataStatus :isDataEnd="isDataEnd" :length="videoList.length" ref="loading" @getVideoList="getVideoList">
+            </DataStatus>
         </main>
 
     </el-container>
@@ -61,10 +62,10 @@ export default {
     name: 'User',
     mixins: [videoList],
     components: {
-    VideoBox,
-    GenderIcon,
-    DataStatus
-},
+        VideoBox,
+        GenderIcon,
+        DataStatus
+    },
     data() {
         return {
             activeChoice: 'work',
@@ -89,11 +90,16 @@ export default {
                 // 如果没有关注，那么type为1表示关注用户
                 // 如果已经关注，那么type为2表示取消关注
                 type: !this.userInfo.isFollow ? 1 : 2
+            }).then(res => {
+                if (res.status === 200) {
+                    // 更新关注状态
+                    this.userInfo.isFollow = !this.userInfo.isFollow
+                    // 更新关注数量
+                    this.userInfo.fanCount += this.userInfo.isFollow ? 1 : - 1
+                }else {
+                    this.$message.error(res.data.msg)
+                }
             })
-            // 更新关注状态
-            this.userInfo.isFollow = !this.userInfo.isFollow
-            // 更新关注数量
-            this.userInfo.fanCount += this.userInfo.isFollow ? 1 : - 1
         },
         getVideoList() {
             return this.reqVideoList(() => VideoPublishList(this.uid, this.latestTime))

@@ -14,7 +14,7 @@ const request = axios.create({
 // 添加请求拦截器，在发送请求之前，携带token
 request.interceptors.request.use((config) => {
     const token = getToken();
-    config.headers.authorization = `${token}`
+    token && (config.headers.authorization = token);
     return config
 }, error => {
     console.log(error)
