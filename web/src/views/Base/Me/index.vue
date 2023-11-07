@@ -61,7 +61,7 @@
             <el-empty description="点击右上角按钮进行登录" v-if="!userInfo.uid" :image-size="180">
             </el-empty>
             <!-- 数据状态 -->
-            <DataStatus v-else :isDataEnd="isDataEnd" :length="videoList.length" ref="loading" @getVideoList="getData">
+            <DataStatus v-else :isDataEnd="isDataEnd" :length="videoList.length" ref="loading" @getVideoList="getVideoList">
             </DataStatus>
         </main>
 
@@ -108,7 +108,6 @@ export default {
         init() {
             // 初始化数据
             this.isDataEnd = false
-            this.loading = false
             this.videoList = []
             this.latestTime = null
         },
@@ -124,19 +123,21 @@ export default {
         },
         getVideoList: debounce(function () {
             // 切换选项，根据选项请求不同数据
-            this.reqVideoList(() => {
-                switch (this.activeChoice) {
-                    case 'work':
-                        return VideoPublishList(this.userInfo.uid, this.latestTime)
-                    case 'like':
-                        return LikeVideoList(this.userInfo.uid, this.latestTime)
-                    case 'collect':
-                        return CollectVideoList(this.userInfo.uid, this.latestTime)
-                    case 'history':
-                        return HistoryVideoList(this.latestTime)
-                }
-            })
-        },100),
+            switch (this.activeChoice) {
+                case 'work':
+                    this.reqVideoList(() => VideoPublishList(this.userInfo.uid, this.latestTime))
+                    break
+                case 'like':
+                    this.reqVideoList(() => LikeVideoList(this.userInfo.uid, this.latestTime))
+                    break
+                case 'collect':
+                    this.reqVideoList(() => CollectVideoList(this.userInfo.uid, this.latestTime))
+                    break
+                case 'history':
+                    this.reqVideoList(() => HistoryVideoList(this.latestTime))
+                    break
+            }
+        }, 100),
         deleteVideo(vid) {
             // 删除视频
             this.videoList = this.videoList.filter(item => item.vid !== vid)
@@ -164,6 +165,11 @@ export default {
     mounted() {
         // 进入页面，重新获取用户信息，保证用户信息是最新的
         this.getUserInfo()
+        // 上滑触底加载更多
+        document.querySelector('#app > section > section > main').onscroll = this.getVideoList
+    },
+    beforeDestroy() {
+        document.querySelector('#app > section > section > main').onscroll = null
     }
 }
 </script>

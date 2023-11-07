@@ -103,26 +103,31 @@ export default {
                 this.$bus.$emit("toggleLogin")
         },
         // 提交评论
-        async submit() {
+        submit() {
             // 发送评论
-            const res = await CommentVideo({
+            CommentVideo({
                 vid: this.vid,
                 content: this.input,
                 pid: this.reply.cid
+            }).then(res => {
+                // 评论失败
+                if (!res) {
+                    return
+                }
+                // 评论成功
+                if (res.status === 200) {
+                    // 清空输入框
+                    this.input = ""
+                    // 清空回复对象
+                    this.reply = {}
+                    // 刷新评论
+                    this.getCommentList()
+                }
+                // 评论失败
+                else {
+                    this.$message.error(res.data.msg)
+                }
             })
-            // 评论失败
-            if (!res) {
-                return
-            }
-            // 评论成功
-            if (res.status === 200) {
-                // 清空输入框
-                this.input = ""
-                // 清空回复对象
-                this.reply = {}
-                // 刷新评论
-                this.getCommentList()
-            }
         },
         changeReply(data) {
             // 回复对象

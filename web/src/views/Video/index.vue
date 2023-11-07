@@ -66,15 +66,18 @@ export default {
     methods: {
         formatTime,
         // 获取视频信息
-        async getVideoInfo() {
-            const res = await VideoInfo(this.vid)
-            if (res.status === 200) {
-                // 获取视频信息成功
-                this.video = res.data.data
-            } else {
-                // 获取视频信息失败
-                this.$message.error(res.data.msg)
-            }
+        getVideoInfo() {
+            VideoInfo(this.vid).then(res => {
+                // 获取视频信息异常
+                if (!res) return
+                if (res.status === 200) {
+                    // 获取视频信息成功
+                    this.video = res.data.data
+                } else {
+                    // 获取视频信息失败
+                    this.$message.error(res.data.msg)
+                }
+            })
         },
     },
     mounted() {
