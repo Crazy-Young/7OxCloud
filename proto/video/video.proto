@@ -1,0 +1,152 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+package videoProto;
+option go_package = ".;videoProto";
+
+service VideoService {
+  rpc Feed (FeedRequest) returns (MiniFeedResponse) {}
+  rpc RecommendedFeed(FeedRequest) returns (FeedResponse) {}
+  rpc HistoryFeed (FeedRequest) returns (HistoryFeedResponse) {}
+  rpc Publish (PublishRequest) returns (google.protobuf.Empty) {}
+  rpc Video (VideoRequest) returns (VideoResponse) {}
+  rpc PublishList (FeedRequest) returns (PublishListResponse) {}
+  rpc FeedByTopic (FeedByTopicRequest) returns (FeedResponse) {}
+  rpc CategoryList (google.protobuf.Empty) returns (CategoryListResponse) {}
+  rpc TopicList (google.protobuf.Empty) returns (TopicListResponse) {}
+  rpc FeedByCategory (FeedByCategoryRequest) returns (MiniFeedResponse) {}
+  rpc FeedBySearch (FeedBySearchRequest) returns (FeedResponse) {}
+  rpc HotFeed (HotFeedRequest) returns (MiniFeedResponse) {}
+  rpc DeleteVideo (VideoRequest) returns (google.protobuf.Empty) {}
+}
+
+message FeedRequest {
+  int64 latestTime = 1;
+  int64 currentUserId = 2;
+}
+
+message HotFeedRequest {
+  int64 currentUserId = 1;
+}
+
+message FeedResponse {
+  repeated Video videos = 1;
+  int64 nextTime = 2;
+}
+
+message PublishRequest {
+  string description = 1;
+  string playUrl = 2;
+  string coverUrl = 3;
+  int64 UserId = 4;
+  repeated string topics = 5;
+  int64 categoryId = 6;
+}
+
+message VideoRequest {
+  int64 id = 1;
+  int64 currentUserId = 2;
+}
+
+message VideoResponse {
+  Video video = 1;
+}
+
+message HistoryFeedResponse {
+  repeated SmallVideo videos = 1;
+  int64 nextTime = 2;
+}
+
+message PublishListResponse {
+  repeated SmallVideo videos = 1;
+  int64 nextTime = 2;
+}
+
+message MiniFeedResponse {
+  repeated MiniVideo videos = 1;
+  int64 nextTime = 2;
+}
+
+message Video{
+  int64 id = 1;
+  string description = 2;
+  string playUrl = 3;
+  string coverUrl = 4;
+  int64 likeCount = 5;
+  int64 commentCount = 6;
+  int64 collectCount = 7;
+  bool isLike = 8;
+  bool isCollect = 9;
+  User author = 10;
+  repeated Topic topics = 11;
+  int64 publishTime = 12;
+}
+
+message MiniVideo{
+  int64 id = 1;
+  string playUrl = 2;
+  string coverUrl = 3;
+  int64 likeCount = 4;
+  string description = 5;
+  repeated Topic topics = 6;
+  MiniUser author = 7;
+  int64 publishTime = 8;
+}
+
+message SmallVideo{
+  int64 id = 1;
+  string playUrl = 2;
+  string coverUrl = 3;
+  int64 likeCount = 4;
+  string description = 5;
+  repeated Topic topics = 6;
+}
+
+message Topic{
+  int64 id = 1;
+  string description = 2;
+}
+
+message User {
+  int64 id = 1;
+  string username = 2;
+  string avatar = 3;
+  string location = 4;
+  bool isFollow = 5;
+}
+
+message MiniUser {
+  int64 id = 1;
+  string username = 2;
+  bool isFollow = 3;
+}
+
+message FeedByTopicRequest {
+  int64 topicId = 1;
+  int64 latestTime = 2;
+  int64 currentUserId = 3;
+}
+
+message CategoryListResponse {
+  repeated Category categories = 1;
+}
+
+message TopicListResponse {
+  repeated Topic topics = 1;
+}
+
+message Category {
+  int64 id = 1;
+  string name = 2;
+}
+
+message FeedByCategoryRequest {
+  int64 categoryId = 1;
+  int64 latestTime = 2;
+  int64 currentUserId = 3;
+}
+
+message FeedBySearchRequest {
+  string keyword = 1;
+  int64 latestTime = 2;
+  int64 currentUserId = 3;
+}

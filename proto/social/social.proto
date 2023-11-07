@@ -1,0 +1,114 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+package socialProto;
+option go_package = ".;socialProto";
+
+service SocialService {
+  rpc Follow(FollowRequest) returns (google.protobuf.Empty) {}
+  rpc CancelFollow(CancelFollowRequest) returns (google.protobuf.Empty) {}
+  rpc GetFollowing(GetFollowingRequest) returns (GetFollowingResponse) {}
+  rpc GetFan(GetFanRequest) returns (GetFanResponse) {}
+  rpc FollowFeed(FollowFeedRequest) returns (FeedResponse) {}
+  rpc FriendFeed(FriendFeedRequest) returns (FeedResponse) {}
+  rpc SearchFollowing(SearchRequest) returns (SearchFollowingResponse) {}
+  rpc SearchFan(SearchRequest) returns (SearchFanResponse) {}
+}
+
+message FollowRequest {
+  int64 userId = 1;
+  int64 fanId = 2;
+}
+
+message CancelFollowRequest {
+  int64 userId = 1;
+  int64 fanId = 2;
+}
+
+message User {
+  int64 id = 1;
+  string username = 2;
+  string avatar = 3;
+  string location = 4;
+}
+
+message Following{
+  int64 id = 1;
+  string username = 2;
+  string avatar = 3;
+  string signature = 4;
+  bool isFan = 5;
+}
+
+message Fan{
+  int64 id = 1;
+  string username = 2;
+  string avatar = 3;
+  string signature = 4;
+  bool isFollow = 5;
+}
+
+message GetFollowingRequest{
+  int64 currentUserId = 1;
+}
+
+message GetFollowingResponse{
+  repeated Following followings = 1;
+  int64 Count = 2;
+}
+
+message GetFanRequest{
+  int64 currentUserId = 1;
+}
+
+message GetFanResponse{
+  repeated Fan fans = 1;
+  int64 Count = 2;
+}
+
+message FollowFeedRequest{
+  int64 userId = 1;
+  int64 latestTime = 2;
+}
+
+message FriendFeedRequest{
+  int64 userId = 1;
+  int64 latestTime = 2;
+}
+
+message FeedResponse{
+  repeated Video videos = 1;
+  int64 nextTime = 2;
+}
+
+message Video{
+  int64 id = 1;
+  string description = 2;
+  string playUrl = 3;
+  string coverUrl = 4;
+  int64 likeCount = 5;
+  int64 commentCount = 6;
+  int64 collectCount = 7;
+  bool isLike = 8;
+  bool isCollect = 9;
+  User author = 10;
+  repeated Topic topics = 11;
+  int64 publishTime = 12;
+}
+
+message Topic{
+  int64 id = 1;
+  string description = 2;
+}
+
+message SearchRequest{
+  string keyword = 1;
+  int64 currentUserId = 2;
+}
+
+message SearchFollowingResponse{
+  repeated Following followings = 1;
+}
+
+message SearchFanResponse{
+  repeated Fan fans = 1;
+}
