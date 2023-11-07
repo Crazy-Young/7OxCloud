@@ -1,4 +1,5 @@
 <h1 align="center" style="border-bottom: none;">7OxCloud</h1>
+<h2 align="center" style="border-bottom: none;">基于推荐系统的高性能分布式Web短视频应用</h2>
 <div class="labels" align="center">
     <a href="https://github.com/Crazy-Young/7OxCloud/blob/master/LICENSE">
       <img src="https://img.shields.io/github/license/Crazy-Young/7OxCloud?style=flat-square" alt="license">
@@ -20,11 +21,13 @@
     </span>
 </div>
 
-####  👀仓库地址：<https://github.com/Crazy-Young/7OxCloud>
+#### 👀仓库地址：<https://github.com/Crazy-Young/7OxCloud>
 
-#### 📚文档地址：<>
+#### 📚接口文档：<https://apifox.com/apidoc/shared-ddccc651-caf3-4d78-b296-eef873d9a6cd>
 
 #### 🥽视频地址：<https://www.bilibili.com/video/BV1Cj411Y7TD>
+
+#### 🏅架构设计：<https://github.com/Crazy-Young/7OxCloud/blob/master/docs/Architecture%20Design.docx>
 
 #### 🎶在线演示：<http://152.136.156.247>
 
@@ -180,3 +183,59 @@ $ npx serve
 # 若有python环境，可执行：
 $ python -m http.server
 ```
+
+## 推荐系统
+
+推荐系统部分基于2022年WWW（CCF A)顶会的Paper [**"Filter-enhanced MLP is All You Need for Sequential Recommendation"**]()。本项目推荐系统代码部分为仓库主目录下的FMLP-RecSys文件夹
+
+### Requirements
+
+请提前下载安装python环境，具体见[Download Python | Python.org](https://www.python.org/downloads/)
+
+项目需要的依赖及库已经形成于FMLP-RecSys/requirements.txt文件中，运行以下代码即可：
+
+```shell
+pip install -r FMLP-RecSys/requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+```
+
+* Install Python, Pytorch(>=1.8).
+* 如果你准备使用 GPU 计算,请安装 CUDA，并结合CUDA版本安装对应适配的Pytorch及相关库.具体可参考Pytorch官网：[Start Locally | PyTorch](https://pytorch.org/get-started/locally/#linux-pip)
+
+### Usage
+
+推荐系统部分被设计成一个服务端，用来与后端系统进行信息交互。因此在确保上述依赖和环境安装好的基础上，直接运行下述代码即可：
+
+```shell
+#如果想将该系统挂为后台应用，请参考使用linux screen命令
+screen -S fmlp
+screen -r fmlp
+
+#注意运行server.py的主目录需要为FMLP-RecSys，否则可能会出现一些相对路径的问题
+#切换到算法部分代码主目录
+cd FMLP-RecSys
+
+#将本机运行为服务端，请结合后端代码修改对应的监听端口
+python server.py  
+```
+
+项目中main.py文件用于使用最新接受的数据来训练模型并生成模型文件，test.py文件用于根据后端发送过来的用户ID调用之前最新的模型以计算该用户最匹配的20个视频ID（为了方式与历史交互记录中的视频重合以及出现视频ID没有在任何人的交互记录中见过的情况，项目推荐结果生成之后会做一些筛选，因此总视频数可能会少于20）
+
+后端系统会定期发送最新的交互记录记录（video-log.csv）并请求模型训练，代码将使用FMLP模型进行训练并保存本地模型文件；后端如若发送用户ID，代码将自动调用test.py文件的测试模型的接口进行该用户的top20匹配视频的推荐。
+
+* 如果本地没有最新的模型文件，推荐将变为随机推荐。
+* 用于训练的交互记录里（主要针对第一次训练），总视频ID总类需大于20，否则将会无法训练，继续使用随机推荐。
+* 模型会自动筛掉用于训练的交互记录中交互数量小于3条的用户，因为模型至少需要分割成train、valid、test集才可进行训练，但模型会保存用户交互记录至本地的data/video-log-sorted-mapped.json文件，该文件将持续更新。
+* 模型如果收到一个新用户的ID，将随机使用一位已记录过的其他用户的历史交互记录进行初始推荐，后续模型会根据该用户之后的交互进行更个性化更准确的推荐。
+
+### Parameter
+
+注意：需保证main.py和test.py中的模型参数一致！！
+
+下述例举一些比较重要、影响模型较大的超参，可以根据个人需求和硬件情况进行个性化的更改：
+
+* **hidden_size**：hidden size of model
+* **num_hidden_layers**：number of filter-enhanced blocks
+* **max_seq_length**：用于训练使用最长历史交互序列长度
+* **epochs**：训练轮数
+* **batch_size**：训练的batch大小
+* **hidden_size**： hidden size of model，模型使用的向量的大小。
