@@ -246,37 +246,36 @@ export default {
                     return
                 }
                 const fn = () => {
-                    if (this.form.videos[0].url.includes("blob:") || this.form.imgs[0].url.includes("blob:")) {
-                        fn()
-                        return
-                    }
-                    const form = {
-                        categoryId: this.form.category,
-                        description: this.form.desc,
-                        topics: this.form.topics,
-                        coverUrl: this.form.imgs[0].url,
-                        playUrl: this.form.videos[0].url
-                    }
-                    VideoPublish(form).then(res => {
-                        if (res.status === 200) {
-                            this.$message.success(res.data.msg)
-                            this.$refs.form.resetFields()
-                            this.initForm()
-                            setTimeout(() => {
-                                this.$router.push({ name: "Home" })
-                            }, 300)
-                        } else {
-                            this.$message.error(res.data.msg)
+                    setTimeout(() => {
+                        if (this.form.videos[0].url.includes("blob:") || this.form.imgs[0].url.includes("blob:")) {
+                            fn()
+                            return
                         }
-                    }).finally(() => {
-                        this.isSubmit = false
-                    })
+                        const form = {
+                            categoryId: this.form.category,
+                            description: this.form.desc,
+                            topics: this.form.topics,
+                            coverUrl: this.form.imgs[0].url,
+                            playUrl: this.form.videos[0].url
+                        }
+                        VideoPublish(form).then(res => {
+                            if (res.status === 200) {
+                                this.$message.success(res.data.msg)
+                                this.$refs.form.resetFields()
+                                this.initForm()
+                                setTimeout(() => {
+                                    this.$router.push({ name: "Home" })
+                                }, 500)
+                            } else {
+                                this.$message.error(res.data.msg)
+                            }
+                        }).finally(() => {
+                            this.isSubmit = false
+                        })
+                    }, 1000 / 16);
                 }
 
-                setTimeout(() => {
-                    fn()
-                }, 1000 / 16)
-
+                fn()
             })
         }
     },
