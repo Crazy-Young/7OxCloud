@@ -11,4 +11,6 @@ nohup go run 7OxCloud-srv/cron/main.go > 7OxCloud-srv/cron/output.log &
 
 nohup go run 7OxCloud-api/main.go -p 8080 > 7OxCloud-api/output.log &
 
-#nohup go run 7OxCloud-api/main.go -p 8081 > 7OxCloud-api/output.log &
+nohup go run 7OxCloud-api/main.go -p 8081 > 7OxCloud-api/output.log &
+
+sudo nginx -c nginx.conf
