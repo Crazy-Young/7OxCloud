@@ -169,14 +169,18 @@ export default {
         },
         async DeleteComment(cid) {
             // 发送删除评论的请求
-            const res = await DeleteComment(cid)
-            if (!res) return
-            if (res.status === 200) {
-                // 删除成功
-                this.$message.success(res.data.msg)
-                // 刷新评论
-                this.$emit('refresh')
-            }
+            DeleteComment(cid).then(res => {
+                if (!res) return
+                if (res.status === 200) {
+                    // 删除成功
+                    this.$message.success(res.data.msg)
+                    // 刷新评论
+                    this.$emit('refresh')
+                }else {
+                    // 删除失败
+                    this.$message.error(res.data.msg)
+                }
+            })
         }
     }
 }

@@ -33,46 +33,55 @@ import { mapState } from "vuex";
 export default {
     name: "UserOperation",
     methods: {
-        async handleLike() {
-            const res = await LikeVideo({
+        handleLike() {
+            LikeVideo({
                 vid: this.vid,
                 type: !this.m_isLike ? 1 : 2
-            });
-            if (!res) return
-            if (res.status === 200) {
-                this.m_likeCount += this.m_isLike ? -1 : 1
-                this.m_isLike = !this.m_isLike
-                this.$message.success(res.data.msg)
-                this.$emit("handleLike", this.vid);
-            }
+            }).then((res) => {
+                if (!res) return
+                if (res.status === 200) {
+                    this.m_likeCount += this.m_isLike ? -1 : 1
+                    this.m_isLike = !this.m_isLike
+                    this.$message.success(res.data.msg)
+                    this.$emit("handleLike", this.vid);
+                } else {
+                    this.$message.error(res.data.msg)
+                }
+            })
         },
         handleComment() {
             this.$emit("handleComment", this.vid);
         },
-        async handleCollect() {
-            const res = await CollectVideo({
+        handleCollect() {
+            CollectVideo({
                 vid: this.vid,
                 type: !this.m_isCollect ? 1 : 2
+            }).then((res) => {
+                if (!res) return
+                if (res.status === 200) {
+                    this.m_collectCount += this.m_isCollect ? -1 : 1
+                    this.m_isCollect = !this.m_isCollect
+                    this.$message.success(res.data.msg)
+                    this.$emit("handleCollect", this.vid);
+                }else {
+                    this.$message.error(res.data.msg)
+                }
             })
-            if (!res) return
-            if (res.status === 200) {
-                this.m_collectCount += this.m_isCollect ? -1 : 1
-                this.m_isCollect = !this.m_isCollect
-                this.$message.success(res.data.msg)
-                this.$emit("handleCollect", this.vid);
-            }
         },
-        async handleFollow() {
-            const res = await FollowUser({
+        handleFollow() {
+            FollowUser({
                 userId: this.uid,
                 type: !this.m_isFollow ? 1 : 2
+            }).then((res) => {
+                if (!res) return
+                if (res.status === 200) {
+                    this.m_isFollow = !this.m_isFollow
+                    this.$message.success(res.data.msg)
+                    this.$emit("handleFollow", this.uid);
+                }else {
+                    this.$message.error(res.data.msg)
+                }
             })
-            if (!res) return
-            if (res.status === 200) {
-                this.m_isFollow = !this.m_isFollow
-                this.$message.success(res.data.msg)
-                this.$emit("handleFollow", this.uid);
-            }
         },
         changeCommentCount(count) {
             this.m_commentCount = count

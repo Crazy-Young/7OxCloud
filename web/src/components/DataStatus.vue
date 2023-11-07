@@ -48,7 +48,7 @@ export default {
             }
         }, {
             // 观察的距交叉的距离
-            threshold: 0.5,
+            threshold: 0.3,
         })
 
         // 监听Loading组件是否出现在视口(包含第一次加载的情况)
