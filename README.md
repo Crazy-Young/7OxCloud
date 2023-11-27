@@ -29,7 +29,6 @@
 
 #### 🏅架构设计：<https://github.com/Crazy-Young/7OxCloud/blob/master/docs/Architecture%20Design.docx>
 
-#### 🎶在线演示：<http://152.136.156.247>
 
 由于阿里短信的限制，这里我们提供演示账号：
 
