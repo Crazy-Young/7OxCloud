@@ -238,3 +238,7 @@ python server.py
 * **epochs**：训练轮数
 * **batch_size**：训练的batch大小
 * **hidden_size**： hidden size of model，模型使用的向量的大小。
+
+## Stargazers over time
+[![Stargazers over time](https://starchart.cc/Crazy-Young/7OxCloud.svg?variant=light)](https://starchart.cc/Crazy-Young/7OxCloud)
+
